@@ -8,8 +8,8 @@ namespace SimulacaoTrab1
 {
     public class BlockingConnector : Connector
     {
-        public BlockingConnector(bool isBlocked, Position position, Transition transition) 
-            : base(position, transition)
+        public BlockingConnector(int ID, bool isBlocked, Position position, Transition transition) 
+            : base(ID, position, transition)
         {
             IsBlocked = isBlocked;
         }

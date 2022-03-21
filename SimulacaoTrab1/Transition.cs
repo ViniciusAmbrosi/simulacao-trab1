@@ -18,8 +18,8 @@ namespace SimulacaoTrab1
             List<Connector>? outboundConnectors = null,
             bool isEnabled = true)
         {
-            this.InboundConnectors = inboundConnectors;
-            this.OutboundConnectors = outboundConnectors;
+            this.InboundConnectors = inboundConnectors != null ? inboundConnectors : new List<Connector>();
+            this.OutboundConnectors = outboundConnectors != null ? outboundConnectors : new List<Connector>();
             this.IsEnabled = isEnabled;
             this.TransitionId = transitionId;
         }

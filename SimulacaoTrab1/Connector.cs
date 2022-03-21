@@ -10,11 +10,13 @@ namespace SimulacaoTrab1
     {
         public Position Position { get; set; }
         public Transition Transition { get; set; }
+        public int ID { get; set; }
 
-        public Connector(Position position, Transition transition)
+        public Connector(int ID, Position position, Transition transition)
         {
             this.Position = position;
             this.Transition = transition;
+            this.ID = ID;
         }
     }
 }

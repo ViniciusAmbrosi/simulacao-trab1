@@ -8,8 +8,8 @@ namespace SimulacaoTrab1
 {
     public class WeightedConnector : Connector
     {
-        public WeightedConnector(Position position, Transition transition, int weight = 1)
-            : base(position, transition)
+        public WeightedConnector(int ID, Position position, Transition transition, int weight = 1)
+            : base(ID, position, transition)
         {
             this.Weight = weight;
         }
