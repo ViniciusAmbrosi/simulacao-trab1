@@ -35,7 +35,7 @@ namespace SimulacaoTrab1
         public void AttemptToEnableTransition()
         {
             if (InboundConnectors == null ||
-                InboundConnectors.Any(connector => connector is BlockingArc && ((BlockingArc)connector).IsBlocked))
+                InboundConnectors.Any(connector => connector is InhibitorArc && ((InhibitorArc)connector).IsBlocked))
             {
                 //skips in case of blocked or empty
                 //handle starvation

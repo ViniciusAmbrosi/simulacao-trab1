@@ -92,7 +92,7 @@ namespace SimulacaoTrab1
             }
             else if (arcType == ArcType.inhibitor)
             {
-                arc = new BlockingArc(id, false, position, transition, weight);
+                arc = new InhibitorArc(id, false, position, transition, weight);
                 Console.WriteLine("Loading blocking arc for position {0} {2} transition {1}", position.Label, transition.Label, isInbound ? "->" : "<-");
             }
             else if (arcType == ArcType.reset)
