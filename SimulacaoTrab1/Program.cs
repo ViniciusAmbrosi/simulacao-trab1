@@ -17,11 +17,12 @@ if (document == null)
 }
 else 
 {
-    PetriNetwork petriNetwork = PnmlModelToPetriModelTranslator.GetTransitions(document);
+    PetriNetwork petriNetwork = PnmlModelToPetriModelTranslator.GetPetryNetwork(document);
 
     int currentNumberOfExecs = 0;
     bool hasAnyEnabledTransition = true;
 
+    Console.WriteLine("\nStarting to execute cycles for petry network -----------------------------------------");
     while (hasAnyEnabledTransition)
     {
         hasAnyEnabledTransition = false;

@@ -1,27 +1,34 @@
-﻿using SimulacaoTrab1.Reader.Model;
+﻿using SimulacaoTrab1.PetriModel.Arc;
+using SimulacaoTrab1.Reader.Model;
 
 namespace SimulacaoTrab1.Translator
 {
     public class PnmlModelToPetriModelTranslator
     {
-        public static PetriNetwork GetTransitions(PNMLDocument document)
+        public static PetriNetwork GetPetryNetwork(PNMLDocument document)
         {
+            Console.WriteLine("Loading petry nework from file into model");
+
             PetriNetwork petriNetwork = new PetriNetwork();
 
+            Console.WriteLine("\nLoading places into model ----------------------------------------- ");
             foreach (var pnmlPlace in document.subnet.Places)
             {
-                Place position = petriNetwork.createPosition(pnmlPlace.Id, pnmlPlace.Label, pnmlPlace.Tokens);
+                petriNetwork.createPosition(pnmlPlace.Id, pnmlPlace.Label, pnmlPlace.Tokens);
             }
 
+            Console.WriteLine("\nLoading transitions into model ------------------------------------ ");
             foreach (var pnmlTransition in document.subnet.Transitions)
             {
-                Transition newTransition = petriNetwork.createTransition(pnmlTransition.id, pnmlTransition.Label);
+                petriNetwork.createTransition(pnmlTransition.Id, pnmlTransition.Label);
             }
 
             int arcId = 0;
+            Console.WriteLine("\nLoading arcs into model ------------------------------------------- ");
             foreach (var pnmlArc in document.subnet.Arcs)
             {
-                Arc arc;
+                ArcType arcType = (ArcType) Enum.Parse(typeof(ArcType), pnmlArc.type.ToString());
+
                 if (petriNetwork.Positions.Any(position => position.Id == pnmlArc.sourceId))
                 {
                     Place? position = petriNetwork.Positions.Find(position => position.Id == pnmlArc.sourceId);
@@ -33,7 +40,7 @@ namespace SimulacaoTrab1.Translator
                     }
                     else
                     {
-                        arc = petriNetwork.createInboundConnection(arcId++, position, transition, pnmlArc.type == PNMLArcType.regular, pnmlArc.multiplicity);
+                        petriNetwork.createInboundConnection(arcId++, position, transition, arcType, pnmlArc.multiplicity);
                     }
                 }
                 else
@@ -47,7 +54,7 @@ namespace SimulacaoTrab1.Translator
                     }
                     else
                     {
-                        arc = petriNetwork.createOutboundConnection(arcId++, position, transition, pnmlArc.type == PNMLArcType.regular, pnmlArc.multiplicity);
+                        petriNetwork.createOutboundConnection(arcId++, position, transition, arcType, pnmlArc.multiplicity);
                     }
                 }
             }

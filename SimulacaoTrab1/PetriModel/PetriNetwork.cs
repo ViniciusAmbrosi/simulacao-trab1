@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SimulacaoTrab1.PetriModel.Arc;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SimulacaoTrab1
 {
     public class PetriNetwork
     {
-        public List<Arc> Arcs { get; set; }
-        public List<Place> Positions { get; set; }
-        public List<Transition> Transitions { get; set; }
-
-        public PetriNetwork()
-        {
-            Arcs = new List<Arc>();
-            Positions = new List<Place>();
-            Transitions = new List<Transition>();
-        }
+        public List<Arc> Arcs { get; set; } = new List<Arc> { };
+        public List<Place> Positions { get; set; } = new List<Place> { };
+        public List<Transition> Transitions { get; set; } = new List<Transition> { };
 
         public void DisplayPetriNetwork(int currentNumberOfExecs)
         {
@@ -37,44 +27,85 @@ namespace SimulacaoTrab1
             Console.WriteLine(stringBuilder.ToString());
         }
 
-        public Place createPosition(int id, string label, int markAmount = 0)
+        public Place createPosition(int id, string label, int tokens = 0)
         {
-            Place position = new Place(id, label, markAmount);
+            Console.WriteLine("Loading place with id {0} label {1} tokens {2}", id, label, tokens);
+
+            Place position = new Place(id, label, tokens);
             Positions.Add(position);
 
             return position;
         }
 
-        public Transition createTransition(int id, string Label)
+        public Transition createTransition(int id, string label)
         {
-            Transition transition = new Transition(id, Label);
+            Console.WriteLine("Loading transition with id {0} label {1}", id, label);
+
+            Transition transition = new Transition(id, label);
             Transitions.Add(transition);
 
             return transition;
         }
 
-        public Arc createInboundConnection(int id, Place position, Transition transition, bool isWeightedArc, int weight = 1)
+        public Arc? createInboundConnection(int id, Place position, Transition transition, ArcType arcType, int weight = 1)
         {
-            Arc connector = isWeightedArc ?
-                new WeightedArc(id, position, transition, weight) :
-                new BlockingArc(id, false, position, transition, weight);
+            Arc? arc = CreateArc(id, position, transition, arcType, weight, true);
 
-            Arcs.Add(connector);
-            transition.InboundConnectors.Add(connector);
+            if (arc == null)
+            {
+                Console.WriteLine("Arc is not of any known type");
+            }
+            else
+            {
+                Arcs.Add(arc);
+                transition.InboundConnectors.Add(arc);
+            }
 
-            return connector;
+            return arc;
         }
 
-        public Arc createOutboundConnection(int id, Place position, Transition transition, bool isWeightedArc, int weight = 1)
+        public Arc? createOutboundConnection(int id, Place position, Transition transition, ArcType arcType, int weight = 1)
         {
-            Arc connector = isWeightedArc ?
-                new WeightedArc(id, position, transition, weight) :
-                new BlockingArc(id, false, position, transition, weight);
+            Arc? arc = CreateArc(id, position, transition, arcType, weight);
 
-            Arcs.Add(connector);
-            transition.OutboundConnectors.Add(connector);
+            if (arc == null)
+            {
+                Console.WriteLine("Arc is not of any known type");
+            }
+            else 
+            {
+                Arcs.Add(arc);
+                transition.OutboundConnectors.Add(arc);
+            }
 
-            return connector;
+            return arc;
+        }
+
+        private Arc? CreateArc(int id, Place position, Transition transition, ArcType arcType, int weight, bool isInbound = false) 
+        {
+            Arc? arc = null;
+
+            if (arcType == ArcType.regular)
+            {
+                arc = new WeightedArc(id, position, transition, weight);
+                Console.WriteLine("Loading regular arc for position {0} {2} transition {1}", position.Label, transition.Label, isInbound ? "->" : "<-"); 
+            }
+            else if (arcType == ArcType.inhibitor)
+            {
+                arc = new BlockingArc(id, false, position, transition, weight);
+                Console.WriteLine("Loading blocking arc for position {0} {2} transition {1}", position.Label, transition.Label, isInbound ? "->" : "<-");
+            }
+            else if (arcType == ArcType.reset)
+            {
+                arc = new ResetArc(id, position, transition, weight);
+                Console.WriteLine("Loading reset arc for position {0} {2} transition {1}", position.Label, transition.Label, isInbound ? "->" : "<-");
+            }
+            else 
+            {
+                Console.WriteLine("Arc is not of any known type");
+            }
+
+            return arc;
         }
     }
 }
