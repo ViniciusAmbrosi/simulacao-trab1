@@ -36,7 +36,7 @@ else
             }
         }
 
-        petriNetwork.DisplayPetriNetwork(currentNumberOfExecs);
+        petriNetwork.DisplayPetriNetwork(currentNumberOfExecs++);
 
         if (!hasAnyEnabledTransition)
         {
@@ -47,7 +47,5 @@ else
         {
             var result = transition.MoveAsync().Result;
         }
-
-        currentNumberOfExecs++;
     }
 }
