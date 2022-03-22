@@ -8,62 +8,70 @@ namespace SimulacaoTrab1
 {
     public class PetriNetwork
     {
-        public IDictionary<int, Connector> idToconnector { get; set; }
-        public IDictionary<int, Position> idToPosition { get; set; }
-        public IDictionary<int, Transition> idToTransition { get; set; }
+        public List<Arc> arcs { get; set; }
+        public List<Position> positions { get; set; }
+        public List<Transition> transitions { get; set; }
 
         public PetriNetwork()
         {
-            idToconnector = new Dictionary<int, Connector>();
-            idToPosition = new Dictionary<int, Position>();
-            idToTransition = new Dictionary<int, Transition>();
+            arcs = new List<Arc>();    
+            positions = new List<Position>();
+            transitions = new List<Transition>(); 
         }
 
-        public Position createPosition(int ID, int markAmount = 0)
+        public void PrintPetriNetwork(int currentNumberOfExecs) {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append($"Cycle {currentNumberOfExecs} | ");
+
+            foreach (var position in positions)
+            {
+                stringBuilder.Append($"{position.Label} - {position.MarkCounter} | ");
+            }
+
+            foreach (var transition in transitions)
+            {
+                stringBuilder.Append($"{transition.Label} - {transition.IsEnabled} | ");
+            }
+
+            Console.WriteLine(stringBuilder.ToString());
+        }
+
+        public Position createPosition(int Id, string label, int markAmount = 0)
         {
-            Position position = new Position(ID, markAmount);
-            idToPosition.Add(ID, position);
+            Position position = new Position(Id, label, markAmount);
+            positions.Add(position);
             return position;
         }
 
-        public bool deletePosition(int ID)
+        public Transition createTransition(int Id, string Label)
         {
-            return idToPosition.Remove(ID);
-        }
-
-        public Transition createTransition(int ID)
-        {
-            Transition transition = new Transition(ID);
-            idToTransition.Add(ID, transition);
+            Transition transition = new Transition(Id, Label);
+            transitions.Add(transition);
             return transition;
         }
 
-        public bool deleteTransition(int ID)
+        public Arc createInboundConnection(int Id, Position position, Transition transition, bool isWeightedArc, int weight = 1)
         {
-            return idToTransition.Remove(ID);
-        }
+            Arc connector = isWeightedArc ? 
+                new WeightedArc(Id, position, transition, weight) : 
+                new BlockingArc(Id, false, position, transition, weight);
 
-        public Connector createInboundConnection(int ID, Position position, Transition transition, int weight = 1)
-        {
-            Connector connector = new WeightedConnector(ID, position, transition, weight);
-            idToconnector.Add(ID, connector);
+            arcs.Add(connector);
             transition.InboundConnectors.Add(connector);
 
             return connector;
         }
 
-        public Connector createOutboundConnection(int ID, Position position, Transition transition, int weight = 1)
+        public Arc createOutboundConnection(int Id, Position position, Transition transition, bool isWeightedArc, int weight = 1)
         {
-            Connector connector = new WeightedConnector(ID, position, transition, weight);
-            idToconnector.Add(ID, connector);
+            Arc connector = isWeightedArc ? 
+                new WeightedArc(Id, position, transition, weight) : 
+                new BlockingArc(Id, false, position, transition, weight);
+
+            arcs.Add(connector);
             transition.OutboundConnectors.Add(connector);
 
             return connector;
-        }
-
-        public bool deleteConnector(int ID)
-        {
-            return idToconnector.Remove(ID);
         }
     }
 }

@@ -8,13 +8,16 @@ namespace SimulacaoTrab1
 {
     public class Position
     {
-        public Position(int ID, int markCounter = 1)
+        public Position(int Id, string label, int markCounter = 1)
         {
             this.MarkCounter = markCounter;
-            this.ID = ID;
+            this.Id = Id;
+            this.Label = label;
         }
 
         public int MarkCounter { get; set; }
-        public int ID { get; set; }
+        public int Id { get; set; }
+
+        public string Label { get; set; }   
     }
 }
