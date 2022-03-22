@@ -10,7 +10,7 @@ namespace SimulacaoTrab1.Translator
 
             foreach (var pnmlPlace in document.subnet.Places)
             {
-                Position position = petriNetwork.createPosition(pnmlPlace.Id, pnmlPlace.Label, pnmlPlace.Tokens);
+                Place position = petriNetwork.createPosition(pnmlPlace.Id, pnmlPlace.Label, pnmlPlace.Tokens);
             }
 
             foreach (var pnmlTransition in document.subnet.Transitions)
@@ -22,10 +22,10 @@ namespace SimulacaoTrab1.Translator
             foreach (var pnmlArc in document.subnet.Arcs)
             {
                 Arc arc;
-                if (petriNetwork.positions.Any(position => position.Id == pnmlArc.sourceId))
+                if (petriNetwork.Positions.Any(position => position.Id == pnmlArc.sourceId))
                 {
-                    Position? position = petriNetwork.positions.Find(position => position.Id == pnmlArc.sourceId);
-                    Transition? transition = petriNetwork.transitions.Find(transition => transition.TransitionId == pnmlArc.destinationid);
+                    Place? position = petriNetwork.Positions.Find(position => position.Id == pnmlArc.sourceId);
+                    Transition? transition = petriNetwork.Transitions.Find(transition => transition.TransitionId == pnmlArc.destinationid);
 
                     if (position == null || transition == null)
                     {
@@ -38,8 +38,8 @@ namespace SimulacaoTrab1.Translator
                 }
                 else
                 {
-                    Transition? transition = petriNetwork.transitions.Find(transition => transition.TransitionId == pnmlArc.sourceId);
-                    Position? position = petriNetwork.positions.Find(position => position.Id == pnmlArc.destinationid);
+                    Transition? transition = petriNetwork.Transitions.Find(transition => transition.TransitionId == pnmlArc.sourceId);
+                    Place? position = petriNetwork.Positions.Find(position => position.Id == pnmlArc.destinationid);
 
                     if (position == null || transition == null)
                     {

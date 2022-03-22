@@ -2,8 +2,8 @@
 {
     public class BlockingArc : Arc
     {
-        public BlockingArc(int ID, bool isBlocked, Position position, Transition transition, int weight = 1) 
-            : base(ID, position, transition, weight)
+        public BlockingArc(int id, bool isBlocked, Place position, Transition transition, int weight = 1) 
+            : base(id, position, transition, weight)
         {
             IsBlocked = isBlocked;
         }

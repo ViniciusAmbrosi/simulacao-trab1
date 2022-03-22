@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 
 namespace SimulacaoTrab1
 {
-    public class Position
+    public class Place
     {
-        public Position(int Id, string label, int markCounter = 1)
+        public Place(int id, string label, int markCounter = 1)
         {
             this.MarkCounter = markCounter;
-            this.Id = Id;
+            this.Id = id;
             this.Label = label;
         }
 
         public int MarkCounter { get; set; }
         public int Id { get; set; }
-
         public string Label { get; set; }   
     }
 }
