@@ -29,9 +29,9 @@ namespace SimulacaoTrab1.Translator
             {
                 ArcType arcType = (ArcType) Enum.Parse(typeof(ArcType), pnmlArc.type.ToString());
 
-                if (petriNetwork.Positions.Any(position => position.Id == pnmlArc.sourceId))
+                if (petriNetwork.Places.Any(position => position.Id == pnmlArc.sourceId))
                 {
-                    Place? position = petriNetwork.Positions.Find(position => position.Id == pnmlArc.sourceId);
+                    Place? position = petriNetwork.Places.Find(position => position.Id == pnmlArc.sourceId);
                     Transition? transition = petriNetwork.Transitions.Find(transition => transition.TransitionId == pnmlArc.destinationid);
 
                     if (position == null || transition == null)
@@ -46,7 +46,7 @@ namespace SimulacaoTrab1.Translator
                 else
                 {
                     Transition? transition = petriNetwork.Transitions.Find(transition => transition.TransitionId == pnmlArc.sourceId);
-                    Place? position = petriNetwork.Positions.Find(position => position.Id == pnmlArc.destinationid);
+                    Place? position = petriNetwork.Places.Find(position => position.Id == pnmlArc.destinationid);
 
                     if (position == null || transition == null)
                     {

@@ -44,7 +44,15 @@ namespace SimulacaoTrab1
             }
 
             List<WeightedArc> weightedInboundConnectors = GetWeightedConnectors(InboundConnectors);
-            this.IsEnabled = weightedInboundConnectors.All(connector => connector.Position.MarkCounter >= connector.Weight);
+            //pega o place 
+            //ve se encontra mais de dois inbound do place para transitions
+            //ve se tem arc com prioridade para place
+            //ve se tem tokens pra suprir todos os arcos (4 tokens - 2 saidas - 2 tokens cada 0 PODE)
+            //se não, escolhe maximo que consegue pagar
+            //reserva tokens 
+            //assigna prioridade para outras transitions
+
+            this.IsEnabled = weightedInboundConnectors.All(connector => connector.Place.MarkCounter >= connector.Weight);
         }
 
         public Task<string> Move()
@@ -56,20 +64,20 @@ namespace SimulacaoTrab1
 
             List<WeightedArc> weightedInboundConnectors = GetWeightedConnectors(InboundConnectors);
 
-            if (weightedInboundConnectors.All(connector => connector.Position.MarkCounter >= connector.Weight))
+            if (weightedInboundConnectors.All(connector => connector.Place.MarkCounter >= connector.Weight))
             {
                 //no blocking connectors + all weighted connectors eligible
                 weightedInboundConnectors.ForEach(connector =>
                 {
                     //add sempahore eventually to handle race conditions
-                    connector.Position.MarkCounter -= connector.Weight;
+                    connector.Place.MarkCounter -= connector.Weight;
                 });
 
                 List<WeightedArc> weightedOutboundConnectors = GetWeightedConnectors(OutboundConnectors);
 
                 weightedOutboundConnectors.ForEach(connector =>
                 {
-                    connector.Position.MarkCounter += connector.Weight;
+                    connector.Place.MarkCounter += connector.Weight;
                 });
 
                 return Task.FromResult("Transition moved");
@@ -78,7 +86,7 @@ namespace SimulacaoTrab1
             return Task.FromResult("Transition didn't move");
         }
 
-        private List<WeightedArc> GetWeightedConnectors(List<Arc>? connectors)
+        public List<WeightedArc> GetWeightedConnectors(List<Arc>? connectors)
         {
             return (connectors?.OfType<WeightedArc>() ?? Enumerable.Empty<WeightedArc>()).ToList();
         }

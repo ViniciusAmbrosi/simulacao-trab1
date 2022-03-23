@@ -25,16 +25,18 @@ else
     Console.WriteLine("\nStarting to execute cycles for petry network -----------------------------------------");
     while (hasAnyEnabledTransition)
     {
-        hasAnyEnabledTransition = false;
-        foreach (var transition in petriNetwork.Transitions)
-        {
-            transition.AttemptToEnableTransition();
+        hasAnyEnabledTransition = EvaluateTransitions(petriNetwork);
 
-            if (transition.IsEnabled)
-            {
-                hasAnyEnabledTransition = true;
-            }
-        }
+        //hasAnyEnabledTransition = false;
+        //foreach (var transition in petriNetwork.Transitions)
+        //{
+        //    transition.AttemptToEnableTransition();
+
+        //    if (transition.IsEnabled)
+        //    {
+        //        hasAnyEnabledTransition = true;
+        //    }
+        //}
 
         petriNetwork.DisplayPetriNetwork(currentNumberOfExecs++);
 
@@ -48,4 +50,48 @@ else
             var result = transition.MoveAsync().Result;
         }
     }
+}
+
+bool EvaluateTransitions(PetriNetwork petriNetwork)
+{
+    bool hasAnyEnabledTransition = false;
+
+    foreach (var transition in petriNetwork.Transitions)
+    {
+        if (transition.InboundConnectors == null ||
+                transition.InboundConnectors.Any(connector => connector is InhibitorArc && ((InhibitorArc)connector).IsBlocked))
+        {
+            //skips in case of blocked or empty
+            //handle starvation
+            transition.IsEnabled = false;
+        }
+
+        List<WeightedArc> weightedInboundArcs = transition.GetWeightedConnectors(transition.InboundConnectors);
+
+        foreach (var arc in weightedInboundArcs)
+        {
+            Place place = arc.Place;
+
+            //pegando todos os arcos que saem do place em questão
+            IEnumerable<Arc> outboundTransitions = weightedInboundArcs.Where(arc => arc.Place.Id == place.Id);
+
+
+            //primeira iteração T1 reserva
+            //segunda iteração T2 ve reserva e ganha prioridade - 1
+            //terceira iteração T3 ve reserva e ganha prioridade - 2
+        }
+
+        transition.IsEnabled = weightedInboundArcs.All(connector => connector.Place.MarkCounter >= connector.Weight);
+        hasAnyEnabledTransition = hasAnyEnabledTransition || transition.IsEnabled;
+    }
+
+    return hasAnyEnabledTransition;
+
+    //pega o place 
+    //ve se encontra mais de dois outbound do place para transitions
+    //ve se tem arc com prioridade para place
+    //ve se tem tokens pra suprir todos os arcos (4 tokens - 2 saidas - 2 tokens cada 0 PODE)
+    //se não, escolhe maximo que consegue pagar
+    //reserva tokens 
+    //assigna prioridade para outras transitions
 }

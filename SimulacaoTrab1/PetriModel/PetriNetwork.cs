@@ -6,7 +6,7 @@ namespace SimulacaoTrab1
     public class PetriNetwork
     {
         public List<Arc> Arcs { get; set; } = new List<Arc> { };
-        public List<Place> Positions { get; set; } = new List<Place> { };
+        public List<Place> Places { get; set; } = new List<Place> { };
         public List<Transition> Transitions { get; set; } = new List<Transition> { };
 
         public void DisplayPetriNetwork(int currentNumberOfExecs)
@@ -14,7 +14,7 @@ namespace SimulacaoTrab1
             var stringBuilder = new StringBuilder();
             stringBuilder.Append($"Cycle {currentNumberOfExecs} | ");
 
-            foreach (var position in Positions)
+            foreach (var position in Places)
             {
                 stringBuilder.Append($"{position.Label} - {position.MarkCounter} | ");
             }
@@ -32,7 +32,7 @@ namespace SimulacaoTrab1
             Console.WriteLine("Loading place with id {0} label {1} tokens {2}", id, label, tokens);
 
             Place position = new Place(id, label, tokens);
-            Positions.Add(position);
+            Places.Add(position);
 
             return position;
         }
