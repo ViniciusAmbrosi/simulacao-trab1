@@ -72,16 +72,45 @@ bool EvaluateTransitions(PetriNetwork petriNetwork)
         {
             Place place = arc.Place;
 
-            //pegando todos os arcos que saem do place em questão
-            IEnumerable<Arc> outboundTransitions = weightedInboundArcs.Where(arc => arc.Place.Id == place.Id);
+            if (place.OutboundConnections.Count > 1)
+            {
+                Arc arcWithHighestPriority = null;
+                foreach(var item in place.OutboundConnections)
+                {
+                    List<WeightedArc> inboundArcs = item.Transition.GetWeightedConnectors(item.Transition.InboundConnectors);
+                    bool hasEnoughMarks = inboundArcs.All(connector => connector.Place.MarkCounter - connector.Place.ReservedMarks >= connector.Weight);
+                    if (hasEnoughMarks)
+                    {
+                        arcWithHighestPriority = item;
+                        arcWithHighestPriority.Place.ReservedMarks += arcWithHighestPriority.Weight;
+                        break;
+                    }
+                }
 
+                if (arcWithHighestPriority != null)
+                {
+                    for (int i = 0; i < place.OutboundConnections.Count; i++)
+                    {
+                        if (arcWithHighestPriority.Transition.Priority > place.OutboundConnections[i].Transition.Priority)
+                        {
+                            arcWithHighestPriority = place.OutboundConnections[i];
+                        }
+                    }
 
-            //primeira iteração T1 reserva
-            //segunda iteração T2 ve reserva e ganha prioridade - 1
-            //terceira iteração T3 ve reserva e ganha prioridade - 2
+                    arcWithHighestPriority.Transition.ReservedMarks = arcWithHighestPriority.Weight;
+                    arcWithHighestPriority.Transition.Priority *= 2;
+                }
+            } 
         }
 
-        transition.IsEnabled = weightedInboundArcs.All(connector => connector.Place.MarkCounter >= connector.Weight);
+        if (transition.ReservedMarks > 0)
+        {
+            transition.IsEnabled = true;
+        } else
+        {
+            transition.IsEnabled = weightedInboundArcs.All(connector => connector.Place.MarkCounter - connector.Place.ReservedMarks >= connector.Weight);
+        }
+
         hasAnyEnabledTransition = hasAnyEnabledTransition || transition.IsEnabled;
     }
 

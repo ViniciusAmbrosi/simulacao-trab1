@@ -8,19 +8,19 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\ambro\\.nuget\\packages\\": {}
+    "C:\\Users\\Gui\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\SimulacaoTrab1.csproj",
+      "projectUniqueName": "D:\\Users\\Gui\\Documents\\GitHub\\simulacao-trab1\\SimulacaoTrab1\\SimulacaoTrab1.csproj",
       "projectName": "SimulacaoTrab1",
-      "projectPath": "C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\SimulacaoTrab1.csproj",
-      "packagesPath": "C:\\Users\\ambro\\.nuget\\packages\\",
-      "outputPath": "C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\obj\\",
+      "projectPath": "D:\\Users\\Gui\\Documents\\GitHub\\simulacao-trab1\\SimulacaoTrab1\\SimulacaoTrab1.csproj",
+      "packagesPath": "C:\\Users\\Gui\\.nuget\\packages\\",
+      "outputPath": "D:\\Users\\Gui\\Documents\\GitHub\\simulacao-trab1\\SimulacaoTrab1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ambro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Gui\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -60,7 +60,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

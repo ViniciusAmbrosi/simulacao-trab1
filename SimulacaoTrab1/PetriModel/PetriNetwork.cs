@@ -58,6 +58,7 @@ namespace SimulacaoTrab1
             else
             {
                 Arcs.Add(arc);
+                position.OutboundConnections.Add(arc);
                 transition.InboundConnectors.Add(arc);
             }
 

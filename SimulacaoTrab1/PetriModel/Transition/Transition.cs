@@ -13,6 +13,8 @@ namespace SimulacaoTrab1
         public bool IsEnabled { get; set; }
         public int TransitionId { get; set; }
         public string Label { get; set; }
+        public int Priority { get; set; }
+        public int ReservedMarks { get; set; }
 
         public Transition(int transitionId,
             string label,
@@ -25,6 +27,8 @@ namespace SimulacaoTrab1
             this.IsEnabled = isEnabled;
             this.TransitionId = transitionId;
             this.Label = label;
+            this.Priority = 1;
+            this.ReservedMarks = 0;
         }
 
         public async Task<string> MoveAsync()
@@ -64,20 +68,35 @@ namespace SimulacaoTrab1
 
             List<WeightedArc> weightedInboundConnectors = GetWeightedConnectors(InboundConnectors);
 
-            if (weightedInboundConnectors.All(connector => connector.Place.MarkCounter >= connector.Weight))
+            if (weightedInboundConnectors.All(connector => connector.Transition.ReservedMarks > 0 || connector.Place.MarkCounter >= connector.Weight))
             {
                 //no blocking connectors + all weighted connectors eligible
                 weightedInboundConnectors.ForEach(connector =>
                 {
                     //add sempahore eventually to handle race conditions
-                    connector.Place.MarkCounter -= connector.Weight;
+                    if (connector.Transition.ReservedMarks > 0)
+                    {
+                        connector.Place.MarkCounter -= connector.Transition.ReservedMarks;
+                        connector.Place.ReservedMarks -= connector.Transition.ReservedMarks;
+                    }
+                    else
+                    {
+                        connector.Place.MarkCounter -= connector.Weight;
+                    }
                 });
 
                 List<WeightedArc> weightedOutboundConnectors = GetWeightedConnectors(OutboundConnectors);
 
                 weightedOutboundConnectors.ForEach(connector =>
                 {
-                    connector.Place.MarkCounter += connector.Weight;
+                    if (connector.Transition.ReservedMarks > 0)
+                    {
+                        connector.Place.MarkCounter += connector.Transition.ReservedMarks;
+                        connector.Transition.ReservedMarks -= connector.Weight;
+                    } else
+                    {
+                        connector.Place.MarkCounter += connector.Weight;
+                    }
                 });
 
                 return Task.FromResult("Transition moved");
