@@ -110,7 +110,6 @@ bool EvaluateTransitions(PetriNetwork petriNetwork)
         {
             transition.IsEnabled = weightedInboundArcs.All(connector => connector.Place.MarkCounter - connector.Place.ReservedMarks >= connector.Weight);
         }
-
         hasAnyEnabledTransition = hasAnyEnabledTransition || transition.IsEnabled;
     }
 
