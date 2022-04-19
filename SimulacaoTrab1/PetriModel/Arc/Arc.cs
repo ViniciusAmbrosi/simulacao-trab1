@@ -7,7 +7,6 @@
         public int Id { get; set; }
         public int Weight { get; set; }
         public int Priority { get; set; }
-        public bool ReadyToExecute { get; set; }
 
         public Arc(int id, Place position, Transition transition, int weight)
         {
@@ -15,7 +14,6 @@
             this.Transition = transition;
             this.Id = id;
             this.Weight = weight;
-            this.ReadyToExecute = true;
         }
     }
 }
