@@ -21,7 +21,7 @@ namespace SimulacaoTrab1
 
             foreach (var transition in Transitions)
             {
-                stringBuilder.Append($"{transition.Label} - {transition.IsEnabled} | ");
+                stringBuilder.Append($"{transition.Label} - {transition.Enabled} | ");
             }
 
             Console.WriteLine(stringBuilder.ToString());

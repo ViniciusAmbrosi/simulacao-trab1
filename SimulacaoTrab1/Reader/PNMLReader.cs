@@ -5,7 +5,7 @@ namespace SimulacaoTrab1.Reader
 {
     public static class PNMLReader
     {
-        public static PNMLDocument? ReadFile(string filePath = "C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\resources\\rederefTA.pflow")
+        public static PNMLDocument? ReadFile(string filePath = "C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\resources\\newmodel.pflow")
         {
             string myFile = File.ReadAllText(filePath);
 

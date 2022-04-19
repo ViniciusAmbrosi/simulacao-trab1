@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimulacaoTrab1
+﻿namespace SimulacaoTrab1
 {
     public class Arc
     {
@@ -12,6 +6,8 @@ namespace SimulacaoTrab1
         public Transition Transition { get; set; }
         public int Id { get; set; }
         public int Weight { get; set; }
+        public int Priority { get; set; }
+        public bool ReadyToExecute { get; set; }
 
         public Arc(int id, Place position, Transition transition, int weight)
         {
@@ -19,6 +15,7 @@ namespace SimulacaoTrab1
             this.Transition = transition;
             this.Id = id;
             this.Weight = weight;
+            this.ReadyToExecute = true;
         }
     }
 }

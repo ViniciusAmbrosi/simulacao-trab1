@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SimulacaoTrab1
 {
@@ -10,25 +6,21 @@ namespace SimulacaoTrab1
     {
         public List<Arc> InboundConnectors { get; set; }
         public List<Arc> OutboundConnectors { get; set; }
-        public bool IsEnabled { get; set; }
+        public bool Enabled { get; set; }
         public int TransitionId { get; set; }
         public string Label { get; set; }
-        public int Priority { get; set; }
-        public int ReservedMarks { get; set; }
 
         public Transition(int transitionId,
             string label,
             List<Arc>? inboundConnectors = null,
             List<Arc>? outboundConnectors = null,
-            bool isEnabled = true)
+            bool isEnabled = false)
         {
             this.InboundConnectors = inboundConnectors ?? new List<Arc>();
             this.OutboundConnectors = outboundConnectors ?? new List<Arc>();
-            this.IsEnabled = isEnabled;
+            this.Enabled = isEnabled;
             this.TransitionId = transitionId;
             this.Label = label;
-            this.Priority = 1;
-            this.ReservedMarks = 0;
         }
 
         public async Task<string> MoveAsync()
@@ -39,75 +31,92 @@ namespace SimulacaoTrab1
         public void AttemptToEnableTransition()
         {
             if (InboundConnectors == null ||
-                InboundConnectors.Any(connector => connector is InhibitorArc && ((InhibitorArc)connector).IsBlocked))
+                InboundConnectors.Any(
+                    connector => connector is InhibitorArc &&
+                    ((InhibitorArc)connector).IsBlocked))
             {
-                //skips in case of blocked or empty
-                //handle starvation
-                this.IsEnabled = false;
+                this.Enabled = false;
                 return;
             }
 
-            List<WeightedArc> weightedInboundConnectors = GetWeightedConnectors(InboundConnectors);
-            //pega o place 
-            //ve se encontra mais de dois inbound do place para transitions
-            //ve se tem arc com prioridade para place
-            //ve se tem tokens pra suprir todos os arcos (4 tokens - 2 saidas - 2 tokens cada 0 PODE)
-            //se não, escolhe maximo que consegue pagar
-            //reserva tokens 
-            //assigna prioridade para outras transitions
+            List<WeightedArc> weightedInboundArcs = GetWeightedArcs(InboundConnectors);
+            bool isExecutionPossible = weightedInboundArcs.All(arc => arc.Place.CanSupplyTransition(arc));
 
-            this.IsEnabled = weightedInboundConnectors.All(connector => connector.Place.MarkCounter >= connector.Weight);
+            if (!isExecutionPossible)
+            {
+                //there's no reason to process if the inbound places / arcs do not meet base criteria for execution
+                //execution could lead to deadlock where transitions allocate resources that won't be resolved in posterity
+                this.Enabled = false;
+                return;
+            }
+
+            else
+            {
+                this.Enabled = true;
+
+                foreach (var arc in weightedInboundArcs)
+                {
+                    arc.Place.ReservedMarks = arc.Weight;
+                }
+            }
         }
 
         public Task<string> Move()
         {
-            if (!IsEnabled)
+            if (!Enabled)
             {
                 return Task.FromResult("Transition is not enabled");
             }
 
-            List<WeightedArc> weightedInboundConnectors = GetWeightedConnectors(InboundConnectors);
+            List<WeightedArc> weightedInboundConnectors = GetWeightedArcs(InboundConnectors);
 
-            if (weightedInboundConnectors.All(connector => connector.Transition.ReservedMarks > 0 || connector.Place.MarkCounter >= connector.Weight))
+            while (weightedInboundConnectors.All(connector => connector.Place.MarkCounter >= connector.Weight))
             {
                 //no blocking connectors + all weighted connectors eligible
+                //add sempahore eventually to handle race conditions
                 weightedInboundConnectors.ForEach(connector =>
                 {
-                    //add sempahore eventually to handle race conditions
-                    if (connector.Transition.ReservedMarks > 0)
+                    if (connector is ResetArc)
                     {
-                        connector.Place.MarkCounter -= connector.Transition.ReservedMarks;
-                        connector.Place.ReservedMarks -= connector.Transition.ReservedMarks;
+                        connector.Place.MarkCounter -= connector.Place.MarkCounter;
+
+                        if (connector.Place.ReservedMarks > 0)
+                        {
+                            connector.Place.ReservedMarks -= connector.Place.ReservedMarks;
+                        }
                     }
                     else
                     {
                         connector.Place.MarkCounter -= connector.Weight;
+
+                        if (connector.Place.ReservedMarks > 0)
+                        {
+                            connector.Place.ReservedMarks -= connector.Place.ReservedMarks;
+                        }
                     }
                 });
 
-                List<WeightedArc> weightedOutboundConnectors = GetWeightedConnectors(OutboundConnectors);
+                List<WeightedArc> weightedOutboundConnectors = GetWeightedArcs(OutboundConnectors);
 
-                weightedOutboundConnectors.ForEach(connector =>
-                {
-                    if (connector.Transition.ReservedMarks > 0)
-                    {
-                        connector.Place.MarkCounter += connector.Transition.ReservedMarks;
-                        connector.Transition.ReservedMarks -= connector.Weight;
-                    } else
-                    {
-                        connector.Place.MarkCounter += connector.Weight;
-                    }
-                });
-
-                return Task.FromResult("Transition moved");
+                weightedOutboundConnectors.ForEach(connector => connector.Place.MarkCounter += connector.Weight);
             }
 
-            return Task.FromResult("Transition didn't move");
+            return Task.FromResult("Movement Processed");
         }
 
-        public List<WeightedArc> GetWeightedConnectors(List<Arc>? connectors)
+        public List<WeightedArc> GetWeightedArcs(List<Arc>? arcs)
         {
-            return (connectors?.OfType<WeightedArc>() ?? Enumerable.Empty<WeightedArc>()).ToList();
+            return (arcs?.OfType<WeightedArc>() ?? Enumerable.Empty<WeightedArc>()).ToList();
+        }
+
+        public IEnumerable<WeightedArc> GetPriorityArcs(List<WeightedArc> arcs)
+        {
+            return arcs.Where(arc => arc.Priority != 0).OrderByDescending(arc => arc.Priority);
+        }
+
+        public IEnumerable<WeightedArc> GetUnprioritizedArcs(List<WeightedArc> arcs)
+        {
+            return arcs.Where(arc => arc.Priority == 0);
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace SimulacaoTrab1
 {
-    public class ResetArc : Arc
+    public class ResetArc : WeightedArc
     {
-        public ResetArc(int id, Place position, Transition transition, int weight) : 
+        public ResetArc(int id, Place position, Transition transition, int weight = 1) : 
             base(id, position, transition, weight)
         {
         }
