@@ -33,7 +33,7 @@ namespace SimulacaoTrab1
             if (InboundConnectors == null ||
                 InboundConnectors.Any(
                     connector => connector is InhibitorArc &&
-                    ((InhibitorArc)connector).IsBlocked))
+                    ((InhibitorArc)connector).IsBlocked()))
             {
                 this.Enabled = false;
                 return;
