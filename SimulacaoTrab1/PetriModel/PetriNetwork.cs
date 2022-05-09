@@ -12,7 +12,7 @@ namespace SimulacaoTrab1
         public void DisplayPetriNetwork(int currentNumberOfExecs)
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.Append($"Cycle {currentNumberOfExecs} | ");
+            stringBuilder.Append($"\nCycle {currentNumberOfExecs} | ");
 
             foreach (var position in Places)
             {

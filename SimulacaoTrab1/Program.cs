@@ -3,7 +3,7 @@ using SimulacaoTrab1.Reader;
 using SimulacaoTrab1.Reader.Model;
 using SimulacaoTrab1.Translator;
 
-PNMLDocument? document = PNMLReader.ReadFile();
+PNMLDocument? document = PNMLReader.ReadFile("C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\resources\\newmodel.pflow");
 
 if (document == null)
 {
