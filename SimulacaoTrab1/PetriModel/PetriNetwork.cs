@@ -9,6 +9,47 @@ namespace SimulacaoTrab1
         public List<Place> Places { get; set; } = new List<Place> { };
         public List<Transition> Transitions { get; set; } = new List<Transition> { };
 
+        public bool AttemptToMoveTransitions()
+        {
+            bool hasEnabledTransitions = false;
+            foreach (var transition in this.Transitions)
+            {
+                transition.AttemptToEnableTransition();
+                if (transition.Enabled)
+                {
+                    hasEnabledTransitions = true;
+                }
+            }
+
+            if (!hasEnabledTransitions)
+            {
+                return false;
+            }
+
+            foreach (var transition in this.Transitions)
+            {
+                var result = transition.MoveAsync().Result;
+            }
+
+            //execute delayed actions and cleanup for further execution
+            this.Places.ForEach(place => {
+                place.DelayedActions.ForEach(action => action());
+                place.DelayedActions = new List<Action>();
+            });
+
+            return hasEnabledTransitions;
+        }
+
+        public void AddTokenToPlaceWithID(int id, int tokens)
+        {
+            Place? place = this.Places.Find(place => place.Id == id);
+
+            if (place != null)
+            {
+                place.MarkCounter += tokens;
+            }
+        }
+
         public void DisplayPetriNetwork(int currentNumberOfExecs)
         {
             var stringBuilder = new StringBuilder();

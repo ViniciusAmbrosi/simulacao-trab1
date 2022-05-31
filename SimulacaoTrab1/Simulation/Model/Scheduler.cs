@@ -64,7 +64,7 @@
         //retorna referência para instância de Entity
         public Entity GetEntity(int id)
         {
-            return null
+            return null;
         }
         //createResource(name, quantity):id
         public int CreateResource(string name, int quantity)
