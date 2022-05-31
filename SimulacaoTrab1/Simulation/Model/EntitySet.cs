@@ -3,18 +3,14 @@
     public class EntitySet
     {
         public string Name { get; set; }
-        //id: integer | atribuído pelo Scheduler
         public int? Id { get; set; }
-
         //mode: método remove() sorteia qual entidade será removida;
         //neste mode, é + interessante empregar removeById(id)
         //getMode(): mode e setMode(mode)
         public EntitySetMode EntitySetMode { get; set; }
-        //getSize() : integer | retorna quantidade de entidades presentes no conjunto no momento
         public int Size { get; set; }
-        //maxPossibleSize: integer (zero for not size limited) | tamanho máximo que o conjunto pode ter
-        //getMaxPossibleSize() : integer e setMaxPossibleSize(size)
         public int MaxPossibleSize { get; set; }
+        public List<Entity> entities { get; set; }
 
         public EntitySet(string name, EntitySetMode entitySetMode, int maxPossibleSize)
         {
@@ -22,17 +18,35 @@
             this.EntitySetMode = entitySetMode;
             this.MaxPossibleSize = maxPossibleSize;
             this.Size = 0;
+            this.entities = new List<Entity>();
         }
 
-        //insert(Entity) | similar a enqueue ou push...
         public void Push(Entity entity)
-        { 
+        {
+            if (Size == 0 || Size + 1 <= MaxPossibleSize)
+            {
+                entities.Add(entity);
+            }
         }
 
-        //remove(): Entity | similar a dequeue ou pop...
-        public Entity Pop()
+        public Entity? Pop()
         {
-            return null;
+            if (EntitySetMode == EntitySetMode.FIFO)
+            {
+                return entities.First();
+            }
+            else if (EntitySetMode == EntitySetMode.LIFO)
+            {
+                return entities.Last();
+            }
+            else if (EntitySetMode == EntitySetMode.PRIORITY)
+            {
+                return entities.MinBy(x => x.Priority);
+            }
+            else 
+            {
+                return null;
+            }
         }
 
         //removeById(id): Entity

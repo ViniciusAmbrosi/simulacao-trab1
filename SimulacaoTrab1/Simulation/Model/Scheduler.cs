@@ -6,53 +6,32 @@
         public double Time { get; set; }
 
         //scheduleNow(Event)
-        public void Schedule(Event eventToExecute)
+        public virtual void Schedule(Event eventToExecute)
         { 
         }
         //scheduleIn(Event, timeToEvent)
-        public void Schedule(Event eventToExecute, double timeToEvent)
+        public virtual void Schedule(Event eventToExecute, double timeToEvent)
         {
         }
         //scheduleAt(Event, absoluteTime)
-        public void Schedule(Event eventToExecute, DateTime absoluteTime)
+        public virtual void Schedule(Event eventToExecute, DateTime absoluteTime)
         {
         }
-        //startProcessNow(processId)
-        public void StartProcess(Process process)
-        {
-        }
-        //startProcessIn(processId, timeToStart)
-        public void StartProcess(Process process, double timeToStart)
-        {
-        }
-        //startProcessAt(processId, absoluteTime)
-        public void StartProcess(Process process, DateTime absoluteTime)
-        {
-        }
-        //waitFor(time)
-        //se a abordagem para especificação da passagem de tempo nos processos for explícita
-        public void WaitFor(double time)
-        { 
-        }
-        //simulateOneStep
-        //executa somente uma primitiva da API e interrompe execução;
-        //por ex.: dispara um evento e para; insere numa fila e para, etc.
         public void SimulateOneStep()
         {
         }
         //simulate
         //executa até esgotar o modelo, isto é, até a engine não ter mais nada para processar
         //(FEL vazia, i.e., lista de eventos futuros vazia)
-        public void Simulate()
+        public virtual void Simulate()
         { 
         }
-        //simulateBy(duration)
-        public void Simulate(double timeToStart)
+        public virtual void Simulate(double timeToStart)
         {
         }
         //simulateUntil(absoluteTime)
         //criação, destruição e acesso para componentes
-        public void Simulate(DateTime absoluteTime)
+        public virtual void Simulate(DateTime absoluteTime)
         {
         }
         //createEntity(Entity)
@@ -64,7 +43,7 @@
         //retorna referência para instância de Entity
         public Entity GetEntity(int id)
         {
-            return null
+            return null;
         }
         //createResource(name, quantity):id
         public int CreateResource(string name, int quantity)

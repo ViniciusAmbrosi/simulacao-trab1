@@ -10,7 +10,9 @@
         public double CreationTime{ get; set; }
         //priority: integer sem prioridade: -1 (0: + alta e 255: + baixa)
         public int Priority { get; set; }
-        //setPetriNet(PetriNet) e getPetriNet():PetriNet
+
+        public Resource? Resource { get; set; }
+
         public PetriNetwork? PetriNetwork { get; set; }
 
         public Entity(string name, int priority = -1)
@@ -20,19 +22,16 @@
             this.Priority = priority;
         }
 
-        public Entity(string name, PetriNetwork petriNetwork, int priority = -1) 
+        public Entity(string name, PetriNetwork? petriNetwork = null, Resource? resource = null, int priority = -1) 
             : this(name, priority)
         {
+            this.Resource = resource;
             this.PetriNetwork = petriNetwork;
         }
 
-        //getTimeSinceCreation(): double
         public double GetTimeSinceCreation()
         {
             return DateTime.Now.ToOADate() - this.CreationTime;
         }
-
-        //getSets() :EntitySet List retorna lista de EntitySets nas quais a entidade está inserida
-        //todo: review this
     }
 }
