@@ -2,145 +2,345 @@
 {
     public class Scheduler
     {
-        //getTime()
         public double Time { get; set; }
+        public double TimeLimit { get; set; }
+        public bool TimeLimitMode { get; set; }
+        public bool StepByStepExecutionMode { get; set; }
+        public List<Event> Events;
+        public List<Resource> Resources;
+        public List<EntitySet> EntitySets;
+        public List<Entity> Entities;
+        public List<Entity> DestroyedEntities;
+        public int MaxEntities { get; set; }
 
-        //scheduleNow(Event)
-        public void Schedule(Event eventToExecute)
-        { 
-        }
-        //scheduleIn(Event, timeToEvent)
-        public void Schedule(Event eventToExecute, double timeToEvent)
+        public int CurrentId = -1;
+
+        public Scheduler()
         {
+            Time = 0;
+            TimeLimit = 0;
+            TimeLimitMode = false;
+            Events = new List<Event>();
+            Resources = new List<Resource>();
+            EntitySets = new List<EntitySet>();
+            Entities = new List<Entity>();
+            DestroyedEntities = new List<Entity>();
+            StepByStepExecutionMode = false;
+            MaxEntities = 0;
         }
-        //scheduleAt(Event, absoluteTime)
-        public void Schedule(Event eventToExecute, DateTime absoluteTime)
+
+        // disparo de eventos
+
+        public void ScheduleNow(Event ev)
         {
+            ev.Time = Time;
         }
-        //startProcessNow(processId)
-        public void StartProcess(Process process)
+
+        public void ScheduleIn(Event ev, double timeToEvent)
         {
+            ev.Time = Time + timeToEvent;
         }
-        //startProcessIn(processId, timeToStart)
-        public void StartProcess(Process process, double timeToStart)
+
+        public void ScheduleAt(Event ev, double absoluteTime)
         {
+            ev.Time = absoluteTime;
         }
-        //startProcessAt(processId, absoluteTime)
-        public void StartProcess(Process process, DateTime absoluteTime)
-        {
-        }
-        //waitFor(time)
-        //se a abordagem para especificação da passagem de tempo nos processos for explícita
+
         public void WaitFor(double time)
-        { 
+        {
+            this.Time += time;
         }
-        //simulateOneStep
-        //executa somente uma primitiva da API e interrompe execução;
-        //por ex.: dispara um evento e para; insere numa fila e para, etc.
+
+        //Próximo evento a ser executado
+        public Event? GetNextEvent()
+        {
+            foreach (Event ev in GetEvents())
+            {
+                if (ev.Time >= Time)
+                {
+                    return ev;
+                }
+            }
+            return null;
+        }
+
+        //Eventos sempre ordenados pelo tempo a ser executado
+        public List<Event> GetEvents()
+        {
+            Events.Sort((e1, e2) => e1.Time.CompareTo(e2.Time));
+            return Events.FindAll(e => !e.Executed);
+        }
+
+        // controlando tempo de execução
+
+        public void Simulate()
+        {
+            while (GetNextEvent() != null)
+            {
+                Event? ev = GetNextEvent();
+                Log("Iniciando execução do evento " + ev.Name);
+                CheckStepByStepExecution();
+                ExecuteEvent(ev);
+            }
+        }
+
         public void SimulateOneStep()
         {
-        }
-        //simulate
-        //executa até esgotar o modelo, isto é, até a engine não ter mais nada para processar
-        //(FEL vazia, i.e., lista de eventos futuros vazia)
-        public void Simulate()
-        { 
-        }
-        //simulateBy(duration)
-        public void Simulate(double timeToStart)
-        {
-        }
-        //simulateUntil(absoluteTime)
-        //criação, destruição e acesso para componentes
-        public void Simulate(DateTime absoluteTime)
-        {
-        }
-        //createEntity(Entity)
-        //instancia nova Entity e destroyEntity(id)
-        public void ReplaceEntity(Entity entity)
-        { 
-        }
-        //getEntity(id): Entity
-        //retorna referência para instância de Entity
-        public Entity GetEntity(int id)
-        {
-            return null;
-        }
-        //createResource(name, quantity):id
-        public int CreateResource(string name, int quantity)
-        {
-            return 0;
-        }
-        //getResource(id) : Resource  retorna referência para instância de Resource
-        public Resource GetResource(int id)
-        {
-            return null;
-        }
-        //createProcess(name, duration): processId
-        public int CreateProcess(string name, int duration)
-        {
-            return 0;
-        }
-        //getProcess(processId) :Process  retorna referência para instancia de Process
-        public Process GetProcess(int id)
-        {
-            return null;
-        }
-        //createEvent(name): eventId
-        public int CreateEvent(string name)
-        {
-            return 0;
-        }
-        //getEvent(eventId) :Event  retorna referência para instancia de Event
-        public Event GetEvent(int id)
-        {
-            return null;
-        }
-        //createEntitySet(name, mode, maxPossibleSize): id
-        public int CreateEntitySet(string name, EntitySetMode mode, int maxPossibleSize)
-        {
-            return 0;
-        }
-        //getEntitySet(id) : EntitySet  retorna referência para instancia de EntitySet random variates
-        public EntitySet GetEntitySet(int id)
-        {
-            return null;
-        }
-        //uniform(minValue, maxValue): double
-        public double Uniform(int minValue, int maxValue)
-        {
-            return 0;
-        }
-        //exponential(meanValue): double
-        public double Exponential(int meanValue)
-        {
-            return 0;
-        }
-        //normal(meanValue, stdDeviationValue): double coleta de estatísticas
-        public double Normal(int meanValue, int standardDeviationValue)
-        {
-            return 0;
-        }
-        //getEntityTotalQuantity(): integer  retorna quantidade de entidades criadas até o momento
-        public int GetEntityTotalQuantity()
-        {
-            return 0;
-        }
-        //getEntityTotalQuantity(name): integer  retorna quantidade de entidades criadas cujo nome corresponde ao parâmetro, até o momento
-        public int GetEntityTotalQuantity(string name)
-        {
-            return 0;
-        }
-        //averageTimeInModel(): double  retorna o tempo médio que as entidades permanecem no modelo, desde sua criação até sua destruição
-        public double AverageTimeInModel()
-        {
-            return 0;
+            ExecuteEvent(GetNextEvent());
         }
 
-        //maxEntitiesPresent():integer  retorna o número máximo de entidades presentes no modelo até o momento
-        public int MaxEntitiesPresent()
+        public void SimulateStepByStep()
         {
-            return 0;
+            StepByStepExecutionMode = true;
+            Simulate();
+        }
+
+        public void CheckStepByStepExecution()
+        {
+            if (StepByStepExecutionMode)
+            {
+                Console.Write("Aperte \"ENTER\" para continuar...");
+                var val = Console.ReadLine;
+            }
+        }
+
+        public void simulateBy(double duration)
+        {
+            TimeLimitMode = true;
+            double timeLimit = Time + duration;
+            this.TimeLimit = timeLimit;
+
+            while (canExecute() && Time < timeLimit)
+            {
+                ExecuteEvent(GetNextEvent());
+            }
+        }
+
+        public Boolean canExecute()
+        {
+            return GetEvents().Count > 0;
+        }
+
+        protected void ExecuteEvent(Event ev)
+        {
+
+            foreach (EntitySet es in EntitySets)
+            {
+                es.LogTime();
+            }
+
+
+            if (TimeLimitMode && TimeLimit < ev.Time)
+            {
+                Time = TimeLimit;
+            }
+            else
+            {
+                Time = ev.Time;
+                ev.Execute();
+            }
+        }
+
+        public void SimulateUntil(double absoluteTime)
+        {
+            TimeLimit = absoluteTime;
+            TimeLimitMode = true;
+            while (canExecute() && Time < absoluteTime)
+            {
+                ExecuteEvent(GetNextEvent());
+            }
+        }
+
+        // criação destruição e acesso para componentes
+
+        public Entity CreateEntity(Entity entity)
+        {
+            entity.CreationTime = Time;
+            entity.Scheduler = this;
+            entity.Id = CurrentId++;
+            Entities.Add(entity);
+            if (Entities.Count > MaxEntities)
+            {
+                MaxEntities = Entities.Count;
+            }
+            Log("\nCriando entidade com nome: " + entity.Name + " e id " + entity.Id);
+            CheckStepByStepExecution();
+            return entity;
+        }
+
+        public void DestroyEntity(int id)
+        {
+            Entity entity = GetEntity(id);
+
+            if (entity != null)
+            {
+
+                foreach (EntitySet es in EntitySets)
+                {
+                    es.RemoveById(id);
+                }
+
+                entity.DestructionTime = Time;
+                Entities.Remove(entity);
+                DestroyedEntities.Add(entity);
+            }
+
+        }
+
+        public Entity? GetEntity(int id)
+        {
+            return Entities.Find(e => e.Id == id);
+        }
+
+        public Resource CreateResource(string name, int quantity)
+        {
+            Resource resource = new Resource(name, quantity, this);
+            resource.Id = CurrentId++;
+            Resources.Add(resource);
+
+            Log("Criando recurso com nome: " + name + " e id " + resource.Id);
+            CheckStepByStepExecution();
+
+            return resource;
+        }
+
+        public Resource? getResource(int id)
+        {
+            return Resources.Find(r => r.Id == id);
+        }
+
+        public Resource? GetResourceByName(string name)
+        {
+            return Resources.Find(r => r.Name == name);
+        }
+
+        public Event CreateEvent(Event ev)
+        {
+            ev.Id = CurrentId++;
+            Events.Add(ev);
+            return ev;
+        }
+
+        public Event? GetEvent(int eventId)
+        {
+            return Events.Find(e => e.Id == eventId);
+        }
+
+        public EntitySet CreateEntitySet(string name, List<Entity> entities, int maxPossibleSize)
+        {
+            EntitySet entitySet = new EntitySet(name, maxPossibleSize, this);
+            entitySet.Id = CurrentId++;
+            EntitySets.Add(entitySet);
+            Log("\nCriando entitySet com nome " + name + ", id " + entitySet.Id + " e tamanho " + maxPossibleSize);
+            CheckStepByStepExecution();
+            return entitySet;
+        }
+
+        public EntitySet? GetEntitySetByName(String name)
+        {
+            return EntitySets.Find(e => e.Name == name);
+        }
+
+        public EntitySet? GetEntitySet(int id)
+        {
+            return EntitySets.Find(es => es.Id == id);
+        }
+
+        // random variates
+
+        public static double Uniform(double minValue, double maxValue)
+        {
+            double difference = maxValue - minValue;
+            double res = minValue;
+            res += new Random().NextDouble() * difference;
+            return 60 * res;
+        }
+
+        public static double Exponential(double lambda)
+        {
+            Random rand = new Random();
+            return 60 * Math.Log(1 - rand.NextDouble()) / (-lambda);
+        }
+
+        public static double Normal(double meanValue, double stdDeviationValue)
+        {
+            MathNet.Numerics.Distributions.Normal normalDist = new Normal(mean, stdDev);
+            return 60 * 1;
+        }
+
+        // coleta de estatística
+
+        public void Log(string message)
+        {
+            if (StepByStepExecutionMode)
+            {
+                Console.WriteLine(message);
+            }
+        }
+
+        public void CollectLogs()
+        {
+
+            foreach (Resource r in Resources)
+            {
+                r.AllocationRate();
+                r.AverageAllocation();
+            }
+
+            foreach (EntitySet es in EntitySets)
+            {
+                Console.WriteLine("\nSet: " + es.Name);
+
+                foreach (KeyValuePair<double, int> pair in es.Log)
+                {
+                    Console.WriteLine("Time (in minutes): " + pair.Key / 60 + "; Quantity: " + pair.Value);
+                }
+
+                Console.WriteLine("Average size: " + es.AverageSize());
+                Console.WriteLine("Average time in set: " + es.AverageTimeInSet() / 60);
+                Console.WriteLine("Max time in set: " + es.MaxTimeInSet() / 60);
+            }
+
+
+            Console.WriteLine("\nAverage time in model: " + AverageTimeInModel() / 60);
+
+            Console.WriteLine("Tempo atual: " + Time);
+
+        }
+
+        //Quantidade total de entidades que passaram pelo modelo
+        public int GetEntityTotalQuantity()
+        {
+            return Entities.Count + DestroyedEntities.Count;
+        }
+
+        /**
+         * retorna quantidade de entidades criadas cujo nome corresponde ao parâmetro, até o momento
+         * @param name
+         * @return
+         */
+        public int GetEntityTotalQuantity(string name)
+        {
+            return Entities.FindAll(e => e.Name == name).Count;
+        }
+
+        /**
+         * retorna o tempo médio que as entidades permanecem no modelo, desde sua criação até sua destruição
+         * @return
+         */
+        public double AverageTimeInModel()
+        {
+            double result = 0.0;
+
+            if (Entities.Count > 0)
+            {
+                result += Entities.Sum(e => Time - e.CreationTime) / Entities.Count;
+            }
+            if (DestroyedEntities.Count > 0)
+            {
+                result += DestroyedEntities.Sum(e => e.DestructionTime - e.CreationTime) / DestroyedEntities.Count;
+            }
+            return result;
         }
     }
 }

@@ -16,83 +16,212 @@
         //getMaxPossibleSize() : integer e setMaxPossibleSize(size)
         public int MaxPossibleSize { get; set; }
 
-        public EntitySet(string name, EntitySetMode entitySetMode, int maxPossibleSize)
+        public double LastLogTime { get; set; }
+
+        public double TimeGap { get; set; }
+
+        public IDictionary<double, int> Log = new Dictionary<double, int>();
+
+        public bool IsLogging { get; set; }
+
+        public double CreationTime { get; set; }
+
+        public IDictionary<int, double> EntitiesTimeInSet = new Dictionary<int, double>();
+
+        public IDictionary<int, double> LastUpdateTime = new Dictionary<int, double>();
+
+        public IDictionary<double, int> EntitiesSizeInTime = new Dictionary<double, int>();
+
+        public List<Entity> Entities { get; set; }
+
+        public Scheduler Scheduler { get; set; }
+
+        public EntitySet(string name, int maxPossibleSize, Scheduler scheduler)
         {
             this.Name = name;
-            this.EntitySetMode = entitySetMode;
+            this.EntitySetMode = EntitySetMode.NONE;
             this.MaxPossibleSize = maxPossibleSize;
-            this.Size = 0;
+            this.Entities = new List<Entity>();
+            this.Scheduler = scheduler;
+            this.CreationTime = DateTime.Now.ToOADate();
         }
 
         //insert(Entity) | similar a enqueue ou push...
-        public void Push(Entity entity)
-        { 
+        public void Insert(Entity entity)
+        {
+            Scheduler.Log("\nInserindo entidade com id " + entity.Id + " e nome " + entity.Name + " na fila " + Name);
+            if (Entities.Count >= MaxPossibleSize)
+            {
+                Scheduler.Log("\nNão foi possível inserir entidade com id " + entity.Id + " e nome " + entity.Name + " na fila " + Name + " pois a fila está cheia.");
+            }
+            else
+            {
+                Entities.Add(entity);
+                List<EntitySet> entitySets = entity.Sets;
+                entitySets.Add(this);
+                entity.Sets = entitySets;
+                LastUpdateTime.Add(entity.Id, Scheduler.Time);
+
+                if (!EntitiesTimeInSet.ContainsKey(entity.Id))
+                {
+                    EntitiesTimeInSet.Add(entity.Id, 0.0);
+                }
+                UpdateEntitiesSizeInTime();
+            }
+            Scheduler.CheckStepByStepExecution();
         }
 
         //remove(): Entity | similar a dequeue ou pop...
-        public Entity Pop()
+        public Entity? Remove()
         {
-            return null;
+            if (Entities.Count == 0)
+            {
+                return null;
+            }
+
+            Entity removed;
+
+            switch(EntitySetMode)
+            {
+                case EntitySetMode.FIFO:
+                    removed = Entities[0];
+                    Entities.RemoveAt(0);
+                    break;
+                case EntitySetMode.LIFO:
+                    removed = Entities[Entities.Count - 1];
+                    Entities.RemoveAt(Entities.Count - 1);
+                    break;
+                case EntitySetMode.PRIORITY:
+                    int index = GetIndexEntityMaxPriority();
+                    removed = Entities[index];
+                    Entities.RemoveAt(index);
+                    break;
+                default:
+                    int random = new Random().Next(Entities.Count);
+                    removed = Entities[random];
+                    Entities.RemoveAt(random);
+                    break;
+            }
+
+            Scheduler.Log("\nRemovendo entidade com id " + removed.Id + " e nome " + removed.Name) + " da fila " + Name);
+            Scheduler.CheckStepByStepExecution();
+            List<EntitySet> entitySets = removed.Sets;
+            entitySets.Remove(this);
+            removed.Sets = entitySets;
+            UpdateEntitiesSizeInTime();
+            UpdateEntitityTimeInSet(removed);
+            return removed;
         }
 
-        //removeById(id): Entity
-        public Entity GetAndRemoveById(int id)
+        public int GetIndexEntityMaxPriority()
         {
-            return null;
+            Entity entity = Entities.Aggregate((e1, e2) => e1.Priority >= e2.Priority ? e1 : e2);
+            return Entities.IndexOf(entity);
         }
 
-        //isEmpty() : boolean 
-        public bool IsEmpty()
+        public Entity? RemoveById(int id)
         {
-            return false;
+            Entity? entity = Entities.Find(e => e.Id == id);
+
+            if (entity == null)
+            {
+                Scheduler.Log("Entidade com id " + id + " não encontrada para remoção.");
+                Scheduler.CheckStepByStepExecution();
+                return entity;
+            }
+            Scheduler.Log("\nRemovendo entidade com id " + entity.Id + " e nome " + entity.Name + " da fila " + Name);
+            Scheduler.CheckStepByStepExecution();
+            Entities.Remove(entity);
+            UpdateEntitiesSizeInTime();
+            UpdateEntitityTimeInSet(entity);
+            return entity;
         }
 
-        //isFull() : boolean
-        public bool IsFull()
+        public Entity? GetById(int id)
         {
-            return false;
+            Entity? entity = Entities.Find(e => e.Id == id);
+            return entity;
         }
 
-        //findEntity(id) : Entity
-        //Retorna referência para uma Entity, se esta estiver presente nesta EntitySet
-        public Entity FindEntity(int id)
+        /**
+        * Atualiza o tempo de permanência no set da entidade especificada no parâmetro
+        */
+        public void UpdateEntitityTimeInSet(Entity entity)
         {
-            return null;
+            EntitiesTimeInSet.Add(entity.Id, EntitiesSizeInTime[entity.Id + (Scheduler.Time - LastUpdateTime[entity.Id])]);
+            LastUpdateTime.Add(entity.Id, Scheduler.Time);
         }
 
-        //averageSize() : double | retorna quantidade média de entidades no conjunto
+        /**
+        * Atualiza o tamanho do set no tempo atual
+        */
+        public void UpdateEntitiesSizeInTime()
+        {
+            EntitiesSizeInTime.Add(Scheduler.Time, Entities.Count);
+        }
+
+        //Tamanho médio do set ao decorrer do tempo
         public double AverageSize()
         {
-            return 0;
+            int sumEntitiesSizeInSet = EntitiesSizeInTime.Sum(v => v.Value);
+            if (EntitiesTimeInSet.Count > 0)
+            {
+                return sumEntitiesSizeInSet / EntitiesSizeInTime.Count;
+            }
+            return sumEntitiesSizeInSet;
         }
 
-        //averageTimeInSet(): double | retorna tempo médio que as entidades permaneceram neste conjunto
+        //Faz o log da quantidade de entidades de x em x unidades de tempo
+        public void LogTime()
+        {
+            while (shouldLogTime())
+            {
+                Log.Add(LastLogTime + TimeGap, Entities.Count);
+                LastLogTime += TimeGap;
+            }
+        }
+
+        //Tempo total do set desde sua criação
+        public double GetSetTotalTime()
+        {
+            return Scheduler.Time - CreationTime;
+        }
+
+        //Média de tempo que as entidades ficam no set
         public double AverageTimeInSet()
         {
-            return 0;
-        }
-        //maxTimeInSet(): double | retorna tempo mais longo que uma entidade permaneceu neste conjunto
-        public double maxTimeInSet()
-        {
-            return 0;
+            if (Entities.Count > 0)
+            {
+                foreach (var e in Entities)
+                {
+                    UpdateEntitityTimeInSet(e);
+                }
+            }
+
+            double sumEntitiesTimeInSet = EntitiesTimeInSet.Sum(v => v.Value);
+
+            if (EntitiesTimeInSet.Count > 0)
+            {
+                return sumEntitiesTimeInSet / EntitiesTimeInSet.Count;
+            }
+            return sumEntitiesTimeInSet;
         }
 
-        //startLog(timeGap) | dispara a coleta(log) do tamanho do conjunto;
-        //esta coleta é realizada a cada timeGap unidades de tempo
+        //Máximo de tempo que as entidades ficaram no set
+        public double MaxTimeInSet()
+        {
+            return EntitiesTimeInSet.Values.Max();
+        }
+
         public void StartLog(double timeGap)
-        { 
-        }
-
-        //stopLog()
-        public void StopLog()
-        { 
-        }
-
-        //getLog()) | retorna uma lista contendo o log deste Resource até o momento;
-        //cada elemento desta lista um par<tempoAbsoluto, tamanhoConjunto>
-        public Dictionary<double, double> GetLog()
         {
-            return null;
+            IsLogging = true;
+            this.TimeGap = timeGap;
+        }
+
+        private bool shouldLogTime()
+        {
+            return IsLogging && LastLogTime + TimeGap <= Scheduler.Time;
         }
     }
 }
