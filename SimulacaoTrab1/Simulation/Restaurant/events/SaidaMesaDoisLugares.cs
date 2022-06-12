@@ -20,14 +20,14 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.ClientGroup = clientGroup;
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
             TableForTwo.Release(1);
             Scheduler.DestroyEntity(ClientGroup.Id);
             if (QueueTableForTwo.Entities.Count > 0)
             {
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new ChegadaMesaDoisLugares("Chegada 2 lugares", (ClientGroup)QueueTableForTwo.Remove(), Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new ChegadaMesaDoisLugares("2 Spots Arrival", (ClientGroup)QueueTableForTwo.Remove(), Scheduler)));
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace SimulacaoTrab1.Simulation.Model
+﻿using MathNet.Numerics.Distributions;
+
+namespace SimulacaoTrab1.Simulation.Model
 {
     public class Scheduler
     {
@@ -13,7 +15,7 @@
         public List<Entity> DestroyedEntities;
         public int MaxEntities { get; set; }
 
-        public int CurrentId = -1;
+        public int CurrentId = 1;
 
         public Scheduler()
         {
@@ -99,12 +101,12 @@
         {
             if (StepByStepExecutionMode)
             {
-                Console.Write("Aperte \"ENTER\" para continuar...");
-                var val = Console.ReadLine;
+                Console.WriteLine("Aperte \"ENTER\" para continuar...");
+                var val = Console.Read();
             }
         }
 
-        public void simulateBy(double duration)
+        public void SimulateBy(double duration)
         {
             TimeLimitMode = true;
             double timeLimit = Time + duration;
@@ -262,10 +264,10 @@
             return 60 * Math.Log(1 - rand.NextDouble()) / (-lambda);
         }
 
-        public static double Normal(double meanValue, double stdDeviationValue)
+        public static double Normal(double meanValue, double deviationValue)
         {
-            MathNet.Numerics.Distributions.Normal normalDist = new Normal(mean, stdDev);
-            return 60 * 1;
+            Normal normal = new Normal(meanValue, deviationValue);
+            return 60 * normal.Sample();
         }
 
         // coleta de estatística

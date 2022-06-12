@@ -16,12 +16,12 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.EntitySet = Scheduler.GetEntitySetByName("filaCozinha");
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
             if (Resource.Allocate(1))
             {
-                Scheduler.ScheduleIn(Scheduler.CreateEvent(new TerminoPreparoRefeicao("Termino Preparo Refeicao", ClientGroup, Resource, Scheduler)), Scheduler.Normal(14, 5));
+                Scheduler.ScheduleIn(Scheduler.CreateEvent(new TerminoPreparoRefeicao("End Preparing Meal", ClientGroup, Resource, Scheduler)), Scheduler.Normal(14, 5));
             }
             else
             {

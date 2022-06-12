@@ -57,7 +57,7 @@ namespace SimulacaoTrab1.Simulation.Model
 
         private void SaveAllocationStatistics()
         {
-            AllocatedResourcesOverTime.Add(Scheduler.Time, InitialQuantity - this.Quantity);
+            AllocatedResourcesOverTime[Scheduler.Time] = InitialQuantity - this.Quantity;
             if (LastAllocation.Item2 != 0)
             {
                 TotalAllocationTime += Scheduler.Time - LastAllocation.Item1;

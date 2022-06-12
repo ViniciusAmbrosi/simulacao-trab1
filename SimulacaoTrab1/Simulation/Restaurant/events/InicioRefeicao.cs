@@ -16,7 +16,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             SetResourceByQuantity(grupo);
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
 
@@ -29,7 +29,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
                 return;
             }
 
-            Scheduler.ScheduleIn(Scheduler.CreateEvent(new TerminoRefeicao("Termino Refeicao", ClientGroup, Resource, Scheduler)), Scheduler.Normal(20, 8));
+            Scheduler.ScheduleIn(Scheduler.CreateEvent(new TerminoRefeicao("Finish Meal", ClientGroup, Resource, Scheduler)), Scheduler.Normal(20, 8));
         }
 
         private void SetResourceByQuantity(ClientGroup clientGroup)

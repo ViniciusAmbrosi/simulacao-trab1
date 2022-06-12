@@ -13,6 +13,8 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
 
         public Resource SecondCashier { get; set; }
 
+        private readonly double THREE_HOURS_IN_SECONDS = 3 * 60 * 60;
+
         public ChegadaGrupo(string name, Scheduler scheduler)
         : base(name)
         {
@@ -24,23 +26,23 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.SecondCashier = Scheduler.GetResourceByName("caixa2");
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
             //Grupo pode ser de 1 a 4 pessoas (sorteio randomico).
             int quantity = new Random().Next(4) + 1;
-            Entity clientGroup = Scheduler.CreateEntity(new ClientGroup("Grupo de " + quantity + " clientes", quantity, Scheduler));
+            Entity clientGroup = Scheduler.CreateEntity(new ClientGroup("Group of " + quantity + " clientes", quantity, Scheduler));
 
             //O grupo sempre escolhe a menor fila.
-            if (QueueFirstCashier.Size < QueueSecondCashier.Size)
+            if (QueueFirstCashier.Entities.Count < QueueSecondCashier.Entities.Count)
             {
                 QueueFirstCashier.Insert(clientGroup);
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new AtendimentoCaixa("Atendimento Caixa 1", FirstCashier, QueueFirstCashier, Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new AtendimentoCaixa("Service cashier 1", FirstCashier, QueueFirstCashier, Scheduler)));
             }
             else
             {
                 QueueSecondCashier.Insert(clientGroup);
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new AtendimentoCaixa("Atendimento Caixa 2", SecondCashier, QueueSecondCashier, Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new AtendimentoCaixa("Service cashier 2", SecondCashier, QueueSecondCashier, Scheduler)));
 
             }
 
@@ -50,7 +52,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
                 //A cada exponencial (3) minutos chega um grupo de clientes
                 double eventTime = 0;
                 eventTime = Scheduler.Exponential(3);
-                Scheduler.ScheduleIn(Scheduler.CreateEvent(new ChegadaGrupo("Chegada grupo", Scheduler)), eventTime);
+                Scheduler.ScheduleIn(Scheduler.CreateEvent(new ChegadaGrupo("Group Arrival", Scheduler)), eventTime);
             }
 
         }

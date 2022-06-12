@@ -19,7 +19,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.WaitDesk = Scheduler.GetEntitySetByName("esperandoNoBalcao");
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
 
@@ -27,7 +27,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             {
                 if (QueueFoodReady.GetById(ClientGroup.Id) != null)
                 { // se refeicao ja ta pronta. Se não, TerminoPreparoRefeicao irá agendar
-                    Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", ClientGroup, Scheduler)));
+                    Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin meal", ClientGroup, Scheduler)));
                 }
                 else
                 {
@@ -37,7 +37,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
 
                     if (groupReady != null)
                     {
-                        Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", (ClientGroup)groupReady, Scheduler)));
+                        Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin meal", (ClientGroup)groupReady, Scheduler)));
                     }
                 }
             }
@@ -48,5 +48,4 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
 
         }
     }
-}
 }

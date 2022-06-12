@@ -1,36 +1,55 @@
-﻿using SimulacaoTrab1;
-using SimulacaoTrab1.Reader;
-using SimulacaoTrab1.Reader.Model;
-using SimulacaoTrab1.Translator;
+﻿using SimulacaoTrab1.Simulation.Model;
+using SimulacaoTrab1.Simulation.Restaurant.events;
 
-PNMLDocument? document = PNMLReader.ReadFile("C:\\Project\\simulacao-trab1\\SimulacaoTrab1\\resources\\waiter.pflow");
+Scheduler scheduler = new Scheduler();
 
-if (document == null)
+scheduler.CreateEntitySet("filaCaixa1", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("filaCaixa2", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("filaMesa2Lugares", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("filaMesa4Lugares", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("filaBalcao", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("esperandoNoBalcao", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("esperandoM2", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("esperandoM4", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("filaCozinha", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateEntitySet("filaComidaPronta", new List<Entity>(), 1000).EntitySetMode = EntitySetMode.FIFO;
+scheduler.CreateResource("caixa1", 1);
+scheduler.CreateResource("caixa2", 1);
+scheduler.CreateResource("cozinha", 3);
+scheduler.CreateResource("mesa2Lugares", 4);
+scheduler.CreateResource("mesa4Lugares", 4);
+scheduler.CreateResource("balcao", 6);
+Event chegadaGrupo = scheduler.CreateEvent(new ChegadaGrupo("Group Arrival", scheduler));
+scheduler.ScheduleNow(chegadaGrupo);
+
+
+foreach (EntitySet es in scheduler.EntitySets)
 {
-    Console.WriteLine("XML file malformed, can't process PNML structure.");
+    es.StartLog(14400);
 }
-else 
-{
-    PetriNetwork petriNetwork = PnmlModelToPetriModelTranslator.GetPetryNetwork(document);
+    
 
-    int currentNumberOfExecs = 0;
 
-    Console.WriteLine("\nStarting to execute cycles for petry network -----------------------------------------");
-    petriNetwork.DisplayPetriNetwork(currentNumberOfExecs);
+//Simulate all
+scheduler.Simulate();
 
-    petriNetwork.AddTokenToPlaceWithID(1, 1);
-    petriNetwork.DisplayPetriNetwork(currentNumberOfExecs);
-    petriNetwork.AttemptToMoveTransitions();
+//SimulateBy
+//        while (scheduler.canExecute()) {
+//            System.out.println("Digite por quanto tempo (em segundos) deseja executar o simulador: ");
+//            String value = scanner.nextLine();
+//            scheduler.simulateBy(Double.parseDouble(value));
+//            scheduler.collectLogs();
+//        }
 
-    petriNetwork.DisplayPetriNetwork(++currentNumberOfExecs);
-    petriNetwork.AddTokenToPlaceWithID(6, 1);
-    petriNetwork.DisplayPetriNetwork(currentNumberOfExecs);
-    petriNetwork.AttemptToMoveTransitions();
-    petriNetwork.DisplayPetriNetwork(++currentNumberOfExecs);
+//SimulateUntil
+//        while (scheduler.canExecute()) {
+//            System.out.println("Digite até quando (tempo absoluto, em segundos) deseja executar o simulador: ");
+//            String value = scanner.nextLine();
+//            scheduler.simulateUntil(Double.parseDouble(value));
+//            scheduler.collectLogs();
+//        }
 
-    petriNetwork.AddTokenToPlaceWithID(15, 1);
-    petriNetwork.DisplayPetriNetwork(currentNumberOfExecs);
-    petriNetwork.AttemptToMoveTransitions();
-    petriNetwork.DisplayPetriNetwork(++currentNumberOfExecs);
-}
+//Step by step
+//scheduler.SimulateStepByStep();
 
+scheduler.CollectLogs();

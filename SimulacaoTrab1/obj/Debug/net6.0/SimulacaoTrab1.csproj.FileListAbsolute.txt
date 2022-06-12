@@ -43,3 +43,5 @@ C:\Project\simulacao-trab1\SimulacaoTrab1\obj\Debug\net6.0\refint\SimulacaoTrab1
 C:\Project\simulacao-trab1\SimulacaoTrab1\obj\Debug\net6.0\SimulacaoTrab1.pdb
 C:\Project\simulacao-trab1\SimulacaoTrab1\obj\Debug\net6.0\SimulacaoTrab1.genruntimeconfig.cache
 C:\Project\simulacao-trab1\SimulacaoTrab1\obj\Debug\net6.0\ref\SimulacaoTrab1.dll
+D:\Users\Gui\Documents\GitHub\simulacao-trab1\SimulacaoTrab1\bin\Debug\net6.0\MathNet.Numerics.dll
+D:\Users\Gui\Documents\GitHub\simulacao-trab1\SimulacaoTrab1\obj\Debug\net6.0\SimulacaoTrab1.csproj.CopyComplete

@@ -17,14 +17,14 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.ClientGroup = clientGroup;
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
             TableForFour.Release(1);
             Scheduler.DestroyEntity(ClientGroup.Id);
             if (QueueTableForFour.Entities.Count > 0)
             {
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new ChegadaMesaQuatroLugares("Chegada 4 lugares", (ClientGroup)QueueTableForFour.Remove(), Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new ChegadaMesaQuatroLugares("4 Spots Arrival", (ClientGroup)QueueTableForFour.Remove(), Scheduler)));
             }
         }
     }

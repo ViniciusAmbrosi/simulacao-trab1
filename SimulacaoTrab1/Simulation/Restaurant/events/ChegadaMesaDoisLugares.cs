@@ -19,15 +19,16 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.WaitTable = Scheduler.GetEntitySetByName("esperandoM2");
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
 
             if (Resource.Allocate(1))
             {
                 if (QueueFoodReady.GetById(ClientGroup.Id) != null)
-                { // se refeicao ja ta pronta. Se não, TerminoPreparoRefeicao irá agendar
-                    Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", ClientGroup, Scheduler)));
+                { 
+                    // se refeicao ja ta pronta. Se não, TerminoPreparoRefeicao irá agendar
+                    Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", ClientGroup, Scheduler)));
                 }
                 else
                 {
@@ -37,7 +38,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
 
                     if (groupReady != null)
                     {
-                        Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", (ClientGroup)groupReady, Scheduler)));
+                        Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", (ClientGroup)groupReady, Scheduler)));
                     }
                 }
             }

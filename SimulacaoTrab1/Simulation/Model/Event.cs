@@ -28,11 +28,9 @@
             this.Scheduler = scheduler;
         }
 
-        public void Execute()
+        public virtual void Execute()
         {
             this.Executed = true;
         }
-
-
     }
 }

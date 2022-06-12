@@ -7,9 +7,10 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
         public AtendimentoCaixa(string name, Resource cashier, EntitySet cashierQueue, Scheduler scheduler)
         : base(name, cashier, scheduler)
         {
+            this.EntitySet = cashierQueue;
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
             if (EntitySet.Entities.Count > 0)
@@ -19,7 +20,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
                 {
                     //conseguiu alocar caixa pra atender
                     //Agenda final do atendimento em normal (8,2) minutos
-                    Scheduler.ScheduleIn(Scheduler.CreateEvent(new FinalizarAtendimentoCaixa("Finalizar atendimento caixa", Resource, EntitySet, Scheduler)), Scheduler.Normal(8, 2));
+                    Scheduler.ScheduleIn(Scheduler.CreateEvent(new FinalizarAtendimentoCaixa("Finish cashier service", Resource, EntitySet, Scheduler)), Scheduler.Normal(8, 2));
                 }
             }
         }

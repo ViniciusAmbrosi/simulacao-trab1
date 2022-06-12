@@ -22,7 +22,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             this.WaitM4 = Scheduler.GetEntitySetByName("esperandoM4");
         }
 
-        public new void Execute()
+        public override void Execute()
         {
             base.Execute();
             Resource.Release(1);
@@ -32,24 +32,24 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             { 
                 // verifica se o grupo já está sentado em algum lugar para iniciar a refeicao
                 WaitDesk.RemoveById(ClientGroup.Id);
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", ClientGroup, Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", ClientGroup, Scheduler)));
             }
             else if (WaitM2.GetById(ClientGroup.Id) != null)
             {
                 WaitM2.RemoveById(ClientGroup.Id);
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", ClientGroup, Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", ClientGroup, Scheduler)));
             }
             else if (WaitM4.GetById(ClientGroup.Id) != null)
             {
                 WaitM4.RemoveById(ClientGroup.Id);
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Inicio Refeição", ClientGroup, Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", ClientGroup, Scheduler)));
             }
 
             var nextOrder = QueueKitchen.Remove();
             if (nextOrder != null)
             {
                 //agenda próximo preparo
-                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioPreparoRefeicao("Inicio Preparo Refeição", (ClientGroup)nextOrder, Scheduler)));
+                Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioPreparoRefeicao("Begin Preparing Meal", (ClientGroup)nextOrder, Scheduler)));
             }
         }
     }

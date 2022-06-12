@@ -103,7 +103,7 @@
                     break;
             }
 
-            Scheduler.Log("\nRemovendo entidade com id " + removed.Id + " e nome " + removed.Name) + " da fila " + Name);
+            Scheduler.Log("\nRemovendo entidade com id " + removed.Id + " e nome " + removed.Name + " da fila " + Name);
             Scheduler.CheckStepByStepExecution();
             List<EntitySet> entitySets = removed.Sets;
             entitySets.Remove(this);
@@ -148,8 +148,8 @@
         */
         public void UpdateEntitityTimeInSet(Entity entity)
         {
-            EntitiesTimeInSet.Add(entity.Id, EntitiesSizeInTime[entity.Id + (Scheduler.Time - LastUpdateTime[entity.Id])]);
-            LastUpdateTime.Add(entity.Id, Scheduler.Time);
+            EntitiesTimeInSet[entity.Id] =  EntitiesTimeInSet[entity.Id] + (Scheduler.Time - LastUpdateTime[entity.Id]);
+            LastUpdateTime[entity.Id] = Scheduler.Time;
         }
 
         /**
@@ -157,7 +157,7 @@
         */
         public void UpdateEntitiesSizeInTime()
         {
-            EntitiesSizeInTime.Add(Scheduler.Time, Entities.Count);
+            EntitiesSizeInTime[Scheduler.Time] = Entities.Count;
         }
 
         //Tamanho médio do set ao decorrer do tempo
@@ -210,7 +210,11 @@
         //Máximo de tempo que as entidades ficaram no set
         public double MaxTimeInSet()
         {
-            return EntitiesTimeInSet.Values.Max();
+            if (EntitiesTimeInSet.Count > 0)
+            {
+                return EntitiesTimeInSet.Values.Max();
+            }
+            return 0.0;
         }
 
         public void StartLog(double timeGap)
