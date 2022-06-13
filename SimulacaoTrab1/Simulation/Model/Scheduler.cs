@@ -36,6 +36,11 @@ namespace SimulacaoTrab1.Simulation.Model
         public void ScheduleNow(Event ev)
         {
             ev.Time = Time;
+
+            //foreach (EntitySet es in EntitySets)
+            //{
+            //    es.StartLog(14400);
+            //}
         }
 
         public void ScheduleIn(Event ev, double timeToEvent)
@@ -81,7 +86,7 @@ namespace SimulacaoTrab1.Simulation.Model
             {
                 Event? ev = GetNextEvent();
                 Log("Iniciando execução do evento " + ev.Name);
-                CheckStepByStepExecution();
+                EnforceStepByStepExecution();
                 ExecuteEvent(ev);
             }
         }
@@ -97,7 +102,7 @@ namespace SimulacaoTrab1.Simulation.Model
             Simulate();
         }
 
-        public void CheckStepByStepExecution()
+        public void EnforceStepByStepExecution()
         {
             if (StepByStepExecutionMode)
             {
@@ -125,12 +130,10 @@ namespace SimulacaoTrab1.Simulation.Model
 
         protected void ExecuteEvent(Event ev)
         {
-
             foreach (EntitySet es in EntitySets)
             {
                 es.LogTime();
             }
-
 
             if (TimeLimitMode && TimeLimit < ev.Time)
             {
@@ -166,7 +169,7 @@ namespace SimulacaoTrab1.Simulation.Model
                 MaxEntities = Entities.Count;
             }
             Log("\nCriando entidade com nome: " + entity.Name + " e id " + entity.Id);
-            CheckStepByStepExecution();
+            EnforceStepByStepExecution();
             return entity;
         }
 
@@ -201,7 +204,7 @@ namespace SimulacaoTrab1.Simulation.Model
             Resources.Add(resource);
 
             Log("Criando recurso com nome: " + name + " e id " + resource.Id);
-            CheckStepByStepExecution();
+            EnforceStepByStepExecution();
 
             return resource;
         }
@@ -234,7 +237,7 @@ namespace SimulacaoTrab1.Simulation.Model
             entitySet.Id = CurrentId++;
             EntitySets.Add(entitySet);
             Log("\nCriando entitySet com nome " + name + ", id " + entitySet.Id + " e tamanho " + maxPossibleSize);
-            CheckStepByStepExecution();
+            EnforceStepByStepExecution();
             return entitySet;
         }
 

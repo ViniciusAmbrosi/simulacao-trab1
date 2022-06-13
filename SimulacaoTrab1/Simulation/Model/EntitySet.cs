@@ -68,7 +68,7 @@
                 }
                 UpdateEntitiesSizeInTime();
             }
-            Scheduler.CheckStepByStepExecution();
+            Scheduler.EnforceStepByStepExecution();
         }
 
         //remove(): Entity | similar a dequeue ou pop...
@@ -104,7 +104,7 @@
             }
 
             Scheduler.Log("\nRemovendo entidade com id " + removed.Id + " e nome " + removed.Name + " da fila " + Name);
-            Scheduler.CheckStepByStepExecution();
+            Scheduler.EnforceStepByStepExecution();
             List<EntitySet> entitySets = removed.Sets;
             entitySets.Remove(this);
             removed.Sets = entitySets;
@@ -126,11 +126,11 @@
             if (entity == null)
             {
                 Scheduler.Log("Entidade com id " + id + " não encontrada para remoção.");
-                Scheduler.CheckStepByStepExecution();
+                Scheduler.EnforceStepByStepExecution();
                 return entity;
             }
             Scheduler.Log("\nRemovendo entidade com id " + entity.Id + " e nome " + entity.Name + " da fila " + Name);
-            Scheduler.CheckStepByStepExecution();
+            Scheduler.EnforceStepByStepExecution();
             Entities.Remove(entity);
             UpdateEntitiesSizeInTime();
             UpdateEntitityTimeInSet(entity);

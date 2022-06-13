@@ -43,7 +43,6 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             {
                 QueueSecondCashier.Insert(clientGroup);
                 Scheduler.ScheduleNow(Scheduler.CreateEvent(new AtendimentoCaixa("Service cashier 2", SecondCashier, QueueSecondCashier, Scheduler)));
-
             }
 
             //Gerar grupos de clientes por 3 horas.
@@ -54,7 +53,6 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
                 eventTime = Scheduler.Exponential(3);
                 Scheduler.ScheduleIn(Scheduler.CreateEvent(new ChegadaGrupo("Group Arrival", Scheduler)), eventTime);
             }
-
         }
     }
 }

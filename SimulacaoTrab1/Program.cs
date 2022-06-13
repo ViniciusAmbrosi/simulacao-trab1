@@ -19,16 +19,15 @@ scheduler.CreateResource("cozinha", 3);
 scheduler.CreateResource("mesa2Lugares", 4);
 scheduler.CreateResource("mesa4Lugares", 4);
 scheduler.CreateResource("balcao", 6);
+scheduler.CreateResource("waiter", 2);
+
 Event chegadaGrupo = scheduler.CreateEvent(new ChegadaGrupo("Group Arrival", scheduler));
 scheduler.ScheduleNow(chegadaGrupo);
-
 
 foreach (EntitySet es in scheduler.EntitySets)
 {
     es.StartLog(14400);
 }
-    
-
 
 //Simulate all
 scheduler.Simulate();

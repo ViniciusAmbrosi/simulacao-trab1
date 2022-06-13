@@ -15,7 +15,6 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             base.Execute();
             if (EntitySet.Entities.Count > 0)
             {
-
                 if (Resource.Allocate(1))
                 {
                     //conseguiu alocar caixa pra atender

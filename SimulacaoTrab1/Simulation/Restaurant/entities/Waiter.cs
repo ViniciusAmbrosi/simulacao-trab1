@@ -4,7 +4,6 @@ using SimulacaoTrab1.Reader.Model;
 using SimulacaoTrab1.Translator;
 
 namespace SimulacaoTrab1.Simulation.Model
-
 {
     public class Waiter
     {
