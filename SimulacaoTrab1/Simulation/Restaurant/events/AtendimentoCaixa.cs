@@ -17,9 +17,9 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             {
                 if (Resource.Allocate(1))
                 {
-                    //conseguiu alocar caixa pra atender
-                    //Agenda final do atendimento em normal (8,2) minutos
-                    Scheduler.ScheduleIn(Scheduler.CreateEvent(new FinalizarAtendimentoCaixa("Finish cashier service", Resource, EntitySet, Scheduler)), Scheduler.Normal(8, 2));
+                    Scheduler.ScheduleIn(
+                        Scheduler.CreateEvent(new FinalizarAtendimentoCaixa("Finish cashier service", Resource, EntitySet, Scheduler)),
+                        Scheduler.Normal(8, 2));
                 }
             }
         }

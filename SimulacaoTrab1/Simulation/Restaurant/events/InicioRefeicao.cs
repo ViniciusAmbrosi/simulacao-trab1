@@ -20,10 +20,8 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
         {
             base.Execute();
 
-
             Entity groupOrder = EntitySet.RemoveById(ClientGroup.Id);
 
-            /* Se comida do grupo não está pronta retorna e aguarda a finalização da cozinha chamar esse evento  */
             if (groupOrder == null)
             {
                 return;

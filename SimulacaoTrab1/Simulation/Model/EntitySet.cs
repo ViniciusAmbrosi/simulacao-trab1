@@ -3,38 +3,24 @@
     public class EntitySet
     {
         public string Name { get; set; }
-        //id: integer | atribuído pelo Scheduler
         public int? Id { get; set; }
-
-        //mode: método remove() sorteia qual entidade será removida;
-        //neste mode, é + interessante empregar removeById(id)
-        //getMode(): mode e setMode(mode)
         public EntitySetMode EntitySetMode { get; set; }
-        //getSize() : integer | retorna quantidade de entidades presentes no conjunto no momento
         public int Size { get; set; }
-        //maxPossibleSize: integer (zero for not size limited) | tamanho máximo que o conjunto pode ter
-        //getMaxPossibleSize() : integer e setMaxPossibleSize(size)
         public int MaxPossibleSize { get; set; }
-
         public double LastLogTime { get; set; }
-
         public double TimeGap { get; set; }
+        public bool IsLogging { get; set; }
+        public double CreationTime { get; set; }
+        public List<Entity> Entities { get; set; }
+        public Scheduler Scheduler { get; set; }
 
         public IDictionary<double, int> Log = new Dictionary<double, int>();
-
-        public bool IsLogging { get; set; }
-
-        public double CreationTime { get; set; }
 
         public IDictionary<int, double> EntitiesTimeInSet = new Dictionary<int, double>();
 
         public IDictionary<int, double> LastUpdateTime = new Dictionary<int, double>();
 
         public IDictionary<double, int> EntitiesSizeInTime = new Dictionary<double, int>();
-
-        public List<Entity> Entities { get; set; }
-
-        public Scheduler Scheduler { get; set; }
 
         public EntitySet(string name, int maxPossibleSize, Scheduler scheduler)
         {
@@ -46,7 +32,6 @@
             this.CreationTime = DateTime.Now.ToOADate();
         }
 
-        //insert(Entity) | similar a enqueue ou push...
         public void Insert(Entity entity)
         {
             Scheduler.Log("\nInserindo entidade com id " + entity.Id + " e nome " + entity.Name + " na fila " + Name);
@@ -71,7 +56,6 @@
             Scheduler.EnforceStepByStepExecution();
         }
 
-        //remove(): Entity | similar a dequeue ou pop...
         public Entity? Remove()
         {
             if (Entities.Count == 0)
@@ -143,24 +127,17 @@
             return entity;
         }
 
-        /**
-        * Atualiza o tempo de permanência no set da entidade especificada no parâmetro
-        */
         public void UpdateEntitityTimeInSet(Entity entity)
         {
             EntitiesTimeInSet[entity.Id] =  EntitiesTimeInSet[entity.Id] + (Scheduler.Time - LastUpdateTime[entity.Id]);
             LastUpdateTime[entity.Id] = Scheduler.Time;
         }
 
-        /**
-        * Atualiza o tamanho do set no tempo atual
-        */
         public void UpdateEntitiesSizeInTime()
         {
             EntitiesSizeInTime[Scheduler.Time] = Entities.Count;
         }
 
-        //Tamanho médio do set ao decorrer do tempo
         public double AverageSize()
         {
             int sumEntitiesSizeInSet = EntitiesSizeInTime.Sum(v => v.Value);
@@ -171,7 +148,6 @@
             return sumEntitiesSizeInSet;
         }
 
-        //Faz o log da quantidade de entidades de x em x unidades de tempo
         public void LogTime()
         {
             while (shouldLogTime())
@@ -181,13 +157,11 @@
             }
         }
 
-        //Tempo total do set desde sua criação
         public double GetSetTotalTime()
         {
             return Scheduler.Time - CreationTime;
         }
 
-        //Média de tempo que as entidades ficam no set
         public double AverageTimeInSet()
         {
             if (Entities.Count > 0)
@@ -207,7 +181,6 @@
             return sumEntitiesTimeInSet;
         }
 
-        //Máximo de tempo que as entidades ficaram no set
         public double MaxTimeInSet()
         {
             if (EntitiesTimeInSet.Count > 0)

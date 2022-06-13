@@ -26,7 +26,7 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             if (Resource.Allocate(1))
             {
                 if (QueueFoodReady.GetById(ClientGroup.Id) != null)
-                { // se refeicao ja ta pronta. Se não, TerminoPreparoRefeicao irá agendar
+                {
                     Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", ClientGroup, Scheduler)));
                 }
                 else

@@ -11,16 +11,11 @@ namespace SimulacaoTrab1.Simulation.Model
         public Scheduler Scheduler { get; set; }
         public double TotalAllocationTime { get; set; }
         public int InitialQuantity { get; set; }
-
-        public IDictionary<double, int> AllocatedResourcesOverTime;
-        public Tuple<double, int> LastAllocation;
-
         public Resource(string name, int quantity)
         {
             this.Name = name;
             this.Quantity = quantity;
         }
-
         public Resource(String name, int quantity, Scheduler scheduler)
         {
             this.Name = name;
@@ -32,6 +27,9 @@ namespace SimulacaoTrab1.Simulation.Model
             LastAllocation = new Tuple<double, int>(scheduler.Time, InitialQuantity - this.Quantity);
             this.TotalAllocationTime = 0;
         }
+
+        public IDictionary<double, int> AllocatedResourcesOverTime;
+        public Tuple<double, int> LastAllocation;
 
         public bool Allocate(int quantity)
         {
@@ -87,7 +85,7 @@ namespace SimulacaoTrab1.Simulation.Model
         public double AverageAllocation()
         {
             double result = AllocatedResourcesOverTime.Values.Sum() / Scheduler.Time;
-            Console.WriteLine("Resource " + Name + " average allocation: " + new Decimal(result * 100).ToString("#.##") + "%"););
+            Console.WriteLine("Resource " + Name + " average allocation: " + new Decimal(result * 100).ToString("#.##") + "%");
             return result;
         }
     }

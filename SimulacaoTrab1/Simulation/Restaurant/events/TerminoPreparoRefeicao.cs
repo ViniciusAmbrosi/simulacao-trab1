@@ -27,10 +27,9 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             base.Execute();
             Resource.Release(1);
 
-            EntitySet.Insert(ClientGroup); // insere grupo na fila de comida pronta
+            EntitySet.Insert(ClientGroup);
             if (WaitDesk.GetById(ClientGroup.Id) != null)
             { 
-                // verifica se o grupo já está sentado em algum lugar para iniciar a refeicao
                 WaitDesk.RemoveById(ClientGroup.Id);
                 Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioRefeicao("Begin Meal", ClientGroup, Scheduler)));
             }
@@ -48,7 +47,6 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
             var nextOrder = QueueKitchen.Remove();
             if (nextOrder != null)
             {
-                //agenda próximo preparo
                 Scheduler.ScheduleNow(Scheduler.CreateEvent(new InicioPreparoRefeicao("Begin Preparing Meal", (ClientGroup)nextOrder, Scheduler)));
             }
         }

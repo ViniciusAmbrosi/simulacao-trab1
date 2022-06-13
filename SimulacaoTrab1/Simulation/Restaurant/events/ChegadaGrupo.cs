@@ -29,11 +29,9 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
         public override void Execute()
         {
             base.Execute();
-            //Grupo pode ser de 1 a 4 pessoas (sorteio randomico).
             int quantity = new Random().Next(4) + 1;
             Entity clientGroup = Scheduler.CreateEntity(new ClientGroup("Group of " + quantity + " clientes", quantity, Scheduler));
 
-            //O grupo sempre escolhe a menor fila.
             if (QueueFirstCashier.Entities.Count < QueueSecondCashier.Entities.Count)
             {
                 QueueFirstCashier.Insert(clientGroup);
@@ -45,10 +43,8 @@ namespace SimulacaoTrab1.Simulation.Restaurant.events
                 Scheduler.ScheduleNow(Scheduler.CreateEvent(new AtendimentoCaixa("Service cashier 2", SecondCashier, QueueSecondCashier, Scheduler)));
             }
 
-            //Gerar grupos de clientes por 3 horas.
             if (Scheduler.Time < THREE_HOURS_IN_SECONDS)
             {
-                //A cada exponencial (3) minutos chega um grupo de clientes
                 double eventTime = 0;
                 eventTime = Scheduler.Exponential(3);
                 Scheduler.ScheduleIn(Scheduler.CreateEvent(new ChegadaGrupo("Group Arrival", Scheduler)), eventTime);
