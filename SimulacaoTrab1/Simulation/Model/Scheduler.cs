@@ -156,8 +156,6 @@ namespace SimulacaoTrab1.Simulation.Model
             }
         }
 
-        // criação destruição e acesso para componentes
-
         public Entity CreateEntity(Entity entity)
         {
             entity.CreationTime = Time;
@@ -251,8 +249,6 @@ namespace SimulacaoTrab1.Simulation.Model
             return EntitySets.Find(es => es.Id == id);
         }
 
-        // random variates
-
         public static double Uniform(double minValue, double maxValue)
         {
             double difference = maxValue - minValue;
@@ -273,8 +269,6 @@ namespace SimulacaoTrab1.Simulation.Model
             return 60 * normal.Sample();
         }
 
-        // coleta de estatística
-
         public void Log(string message)
         {
             if (StepByStepExecutionMode)
@@ -285,7 +279,6 @@ namespace SimulacaoTrab1.Simulation.Model
 
         public void CollectLogs()
         {
-
             foreach (Resource r in Resources)
             {
                 r.AllocationRate();
@@ -298,7 +291,7 @@ namespace SimulacaoTrab1.Simulation.Model
 
                 foreach (KeyValuePair<double, int> pair in es.Log)
                 {
-                    Console.WriteLine("Time (in minutes): " + pair.Key / 60 + "; Quantity: " + pair.Value);
+                    Console.WriteLine("Time: " + pair.Key / 60 + " -> Quantity: " + pair.Value);
                 }
 
                 Console.WriteLine("Average size: " + es.AverageSize());
@@ -306,33 +299,20 @@ namespace SimulacaoTrab1.Simulation.Model
                 Console.WriteLine("Max time in set: " + es.MaxTimeInSet() / 60);
             }
 
-
             Console.WriteLine("\nAverage time in model: " + AverageTimeInModel() / 60);
-
             Console.WriteLine("Tempo atual: " + Time);
-
         }
 
-        //Quantidade total de entidades que passaram pelo modelo
         public int GetEntityTotalQuantity()
         {
             return Entities.Count + DestroyedEntities.Count;
         }
 
-        /**
-         * retorna quantidade de entidades criadas cujo nome corresponde ao parâmetro, até o momento
-         * @param name
-         * @return
-         */
         public int GetEntityTotalQuantity(string name)
         {
             return Entities.FindAll(e => e.Name == name).Count;
         }
 
-        /**
-         * retorna o tempo médio que as entidades permanecem no modelo, desde sua criação até sua destruição
-         * @return
-         */
         public double AverageTimeInModel()
         {
             double result = 0.0;
